@@ -68,7 +68,7 @@ export default function Map({ onOpenNav }) {
 
   useEffect(() => {
     if (mapRef.current && jsonContent) {
-      console.log("jsoncontent有改變 就觸發裡面一次");
+      console.log("jsoncontent有改變 就觸發裡面");
       mapRef.current.fitBounds(geojsonRef.current?.getBounds());
     }
   }, [isMapReady, jsonContent]);
