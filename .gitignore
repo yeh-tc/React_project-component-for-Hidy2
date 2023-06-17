@@ -6,6 +6,7 @@
 data
 .pnp.js
 venv
+api.js
 
 # testing
 /coverage
