@@ -10,45 +10,13 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import DrawerIcon from "../drawer/DrawerIcon";
+import CircularProgress from "@mui/material/CircularProgress";
 import markerIconPng from "leaflet/dist/images/marker-icon.png";
 import markShadowPng from "leaflet/dist/images/marker-shadow.png";
 //
-const jsonContent = {
-  type: "FeatureCollection",
-  features: [
-    {
-      type: "Feature",
-      geometry: {
-        type: "LineString",
-        coordinates: [
-          [121, 22],
-          [121, 23],
-        ],
-      },
-      properties: {
-        popupContent: "22,121",
-      },
-    },
-    {
-      type: "Feature",
-      geometry: {
-        type: "Point",
-        coordinates: [121, 22],
-      },
-      properties: {
-        popupContent:
-          "Maryland Institute College of Art is a leader in the world of visual arts featuring undergraduate, graduate, and certificate programs.",
-        icon: {
-          iconUrl: "https://img.icons8.com/nolan/256/university.png",
-          iconSize: [30, 30],
-          iconAnchor: [20, 0],
-        },
-      },
-    },
-  ],
-};
 
 export default function Map({ onOpenNav }) {
+  const [jsonContent, setJsonContent] = useState();
   const [isMapReady, setIsMapReady] = useState(false);
   const mapRef = useRef();
   const geojsonRef = useRef();
@@ -65,7 +33,7 @@ export default function Map({ onOpenNav }) {
     });
     return null;
   };
-
+  useEffect(()=>{},[])
   useEffect(() => {
     if (mapRef.current && jsonContent) {
       console.log("jsoncontent有改變 就觸發裡面");
@@ -124,7 +92,25 @@ export default function Map({ onOpenNav }) {
           attribution="Tiles &copy; Esri"
         />
         {/* 顯示航跡 */}
-        {jsonContent && (
+        {jsonContent === undefined ? (
+          <Box
+            position="absolute"
+            top="50%"
+            left="50%"
+            style={{
+              transform: "translate(-50%, -50%)",
+              zIndex: 1000,
+              width: "100%",
+              height: "100%",
+              backgroundColor: "rgba(0,0,0,0.45)",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <CircularProgress color="secondary" />
+          </Box>
+        ) : (
           <GeoJSON
             data={jsonContent}
             pointToLayer={pointToLayer}
@@ -132,6 +118,7 @@ export default function Map({ onOpenNav }) {
             ref={geojsonRef}
           />
         )}
+
         {/* 放大縮小按鈕 */}
         <ZoomControl position="topright" />
       </MapContainer>
