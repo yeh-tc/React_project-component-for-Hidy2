@@ -10,6 +10,7 @@ export default function FeedPage() {
         <Body sidebar>
             <Post/>
             <p>The current time is .</p>
+            
         </Body>
     );
 }
