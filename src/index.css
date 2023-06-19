@@ -61,3 +61,10 @@ body {
   z-index: 500;
 }
 
+/*沒找到資料的snackbar 900以上的大小*/
+/*沒有drawer 要對齊地圖中間*/
+@media (min-width:900px){
+.MuiSnackbar-root{
+    left: calc(50% + 170px)!important;
+}
+}
