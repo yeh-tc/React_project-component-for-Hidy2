@@ -1,6 +1,7 @@
 import "../../../node_modules/leaflet/dist/leaflet.css";
+import React from "react";
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Container, Box, Popover, Typography } from "@mui/material";
+import { Container, Box } from "@mui/material";
 import {
   MapContainer,
   TileLayer,
@@ -13,8 +14,11 @@ import L from "leaflet";
 import DrawerIcon from "../drawer/DrawerIcon";
 import CircularProgress from "@mui/material/CircularProgress";
 import { api } from "./api";
-import Warning from "./Warning";
-import Icon from "./Icon.svg";
+import NoDataWarning from "./NoDataWarning";
+import FailApiWarning from "./FailApiWarning";
+import Waiting from "./Waiting";
+
+
 
 //
 
@@ -22,12 +26,12 @@ export default function Map({ onOpenNav }) {
   //api 拿資料成功與否的狀況
   //也用在等待期間的loader
   const [jsonContent, setJsonContent] = useState();
+  const [checkAPI, setcheckAPI] = useState();
   const [isMapReady, setIsMapReady] = useState(false);
+  
   //hover 到第一站的marker會顯示航跡和採樣的站
-  const [showLine, setShowLine] = useState(false);
-  const [showPoint, setShowPoint] = useState(false);
-  // popover 是打開與否
-  const [open, setopen] = useState(true);
+  const [showLine, setShowLine] = useState({});
+
   //Ref綁在地圖上
   const mapRef = useRef();
   //Ref綁在航跡上 使用者點該航跡時 視窗會自動把航跡置中用
@@ -51,43 +55,22 @@ export default function Map({ onOpenNav }) {
     fetch(api)
       .then((data) => data.json())
       .then((data) => setJsonContent(data))
-      .catch((err) => console.log(`Error Reading data ${err}`));
+      .catch((err) => setcheckAPI(err));
   }, []);
   //map準備好&有jsonContent 即啟動
+
   useEffect(() => {
-    if (mapRef.current && jsonContent) {
-      console.log("jsoncontent有改變 就觸發裡面");
-      //mapRef.current.fitBounds(geojsonRef.current?.getBounds());
-    }
+    //const coords = [...jsonContent.features[0].geometry.coordinates[0]].reverse();
+    //mapRef.current.fitBounds(geojsonRef.current?.getBounds());
   }, [isMapReady, jsonContent]);
 
-  //const pointToLayer = useCallback((feature, latlng) => {
-  //  if (feature.properties && feature.properties.icon) {
-  //    return L.marker(latlng, {
-  //      icon: L.icon(feature.properties && feature.properties.icon),
-  //    });
-  //  }
-  //
-  //  return L.marker(latlng, {
-  //    icon: L.icon({
-  //      iconUrl: markerIconPng,
-  //      shadowUrl: markShadowPng,
-  //    }),
-  //  });
-  //}, []);
-
-  const onEachFeature = useCallback((feature, layer) => {
-    if (feature.properties && feature.properties.popupContent) {
-      layer.bindPopup(feature.properties.popupContent, {
-        autoClose: false,
-      });
-    }
-  }, []);
-  const id = open ? "simple-popover" : undefined;
-  const handleClose = () => {
-    setJsonContent();
+  const handleMouseOver = (index) => {
+    setShowLine({ [index]: true });
   };
-  console.log(jsonContent);
+
+  const handleMouseOut = (index) => {
+    setShowLine({ [index]: false });
+  };
 
   return (
     <Container disableGutters maxWidth="100%" sx={{ mx: 0 }}>
@@ -118,31 +101,36 @@ export default function Map({ onOpenNav }) {
         />
         {/* 顯示航跡 */}
         {/* 資料還沒進來時 顯示loader */}
-        {jsonContent === undefined ? (
-          <Box
-            position="absolute"
-            top="50%"
-            left="50%"
-            style={{
-              transform: "translate(-50%, -50%)",
-              zIndex: 1000,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.45)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <CircularProgress color="secondary" />
-          </Box>
+        {checkAPI !== undefined ? (
+          <FailApiWarning />
+        ) : jsonContent === undefined ? (
+          <Waiting/>
         ) : /* api返回沒有資料 會有Popover 提醒沒資料 */
-        
+
         jsonContent === "No result" ? (
-          <Warning />
+          <NoDataWarning />
         ) : (
-          /* api返回資料 */
-          <CircularProgress color="secondary" />
+          <>
+            {jsonContent.features.map((feature, index) => {
+              const coords = [...feature.geometry.coordinates[0]].reverse();
+              return (
+
+                <React.Fragment key={index}>
+                <Marker
+                position={coords}
+                eventHandlers={{
+                  mouseover: () => handleMouseOver(index),
+                  mouseout: () => handleMouseOut(index),
+                }}
+              />
+              
+              {showLine[index] && (
+                <GeoJSON data={{ type: "FeatureCollection", features: [feature] }} />
+              )}
+              </React.Fragment>
+              );
+            })}
+          </>
         )}
 
         {/* 放大縮小按鈕 */}
