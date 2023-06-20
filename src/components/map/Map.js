@@ -6,7 +6,6 @@ import {
   MapContainer,
   TileLayer,
   GeoJSON,
-  Marker,
   ZoomControl,
   useMapEvent,
 } from "react-leaflet";
@@ -17,8 +16,7 @@ import { api } from "./api";
 import NoDataWarning from "./NoDataWarning";
 import FailApiWarning from "./FailApiWarning";
 import Waiting from "./Waiting";
-
-
+import stationsvg from "./SVG/sta2.svg";
 
 //
 
@@ -28,7 +26,7 @@ export default function Map({ onOpenNav }) {
   const [jsonContent, setJsonContent] = useState();
   const [checkAPI, setcheckAPI] = useState();
   const [isMapReady, setIsMapReady] = useState(false);
-  
+
   //hover 到第一站的marker會顯示航跡和採樣的站
   const [showLine, setShowLine] = useState({});
 
@@ -71,6 +69,22 @@ export default function Map({ onOpenNav }) {
   const handleMouseOut = (index) => {
     setShowLine({ [index]: false });
   };
+  let svgIcon = new L.Icon({
+    iconUrl: stationsvg,
+    iconSize: [27, 27], // size of the icon
+    iconAnchor: [14, 15], // point of the icon which will correspond to marker's location
+    popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
+  });
+
+  const pointToLayer = useCallback((feature, latlng) => {
+    return L.marker(latlng, {
+      icon: L.icon({
+        iconUrl: stationsvg,
+        iconSize: [27, 27], // size of the icon
+        iconAnchor: [14, 15],
+      }),
+    });
+  }, []);
 
   return (
     <Container disableGutters maxWidth="100%" sx={{ mx: 0 }}>
@@ -104,7 +118,7 @@ export default function Map({ onOpenNav }) {
         {checkAPI !== undefined ? (
           <FailApiWarning />
         ) : jsonContent === undefined ? (
-          <Waiting/>
+          <Waiting />
         ) : /* api返回沒有資料 會有Popover 提醒沒資料 */
 
         jsonContent === "No result" ? (
@@ -112,22 +126,29 @@ export default function Map({ onOpenNav }) {
         ) : (
           <>
             {jsonContent.features.map((feature, index) => {
-              const coords = [...feature.geometry.coordinates[0]].reverse();
+              console.log(...feature.geometry.coordinates[0])
               return (
-
                 <React.Fragment key={index}>
-                <Marker
-                position={coords}
-                eventHandlers={{
-                  mouseover: () => handleMouseOver(index),
-                  mouseout: () => handleMouseOut(index),
-                }}
-              />
-              
-              {showLine[index] && (
-                <GeoJSON data={{ type: "FeatureCollection", features: [feature] }} />
-              )}
-              </React.Fragment>
+                  <GeoJSON
+                    pointToLayer={pointToLayer}
+                    data={{
+                      type: "FeatureCollection",
+                      features: [
+                        {
+                          type: "Feature",
+                          geometry: {
+                            type: "Point",
+                            coordinates: [...feature.geometry.coordinates[0]],
+                          },
+                        },
+                      ],
+                    }}
+                  />
+                  {/*<GeoJSON*/}
+                  {/*  data={{ type: "FeatureCollection", features: [feature] }}*/}
+                  {/*  pathOptions={{ color: "#F2F5F5", weight: 1 }}*/}
+                  {/*/>*/}
+                </React.Fragment>
               );
             })}
           </>
