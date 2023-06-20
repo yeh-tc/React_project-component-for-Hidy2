@@ -11,7 +11,6 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import DrawerIcon from "../drawer/DrawerIcon";
-import CircularProgress from "@mui/material/CircularProgress";
 import { api } from "./api";
 import NoDataWarning from "./NoDataWarning";
 import FailApiWarning from "./FailApiWarning";
@@ -27,14 +26,13 @@ export default function Map({ onOpenNav }) {
   const [checkAPI, setcheckAPI] = useState();
   const [isMapReady, setIsMapReady] = useState(false);
 
-  //hover 到第一站的marker會顯示航跡和採樣的站
-  const [showLine, setShowLine] = useState({});
-
+ 
   //Ref綁在地圖上
   const mapRef = useRef();
   //Ref綁在航跡上 使用者點該航跡時 視窗會自動把航跡置中用
   const geojsonRef = useRef();
-
+  
+  ////
   //showing lon/lat on map when mouse moving on map
   const [coordinates, setCoordinates] = useState(null);
 
@@ -48,6 +46,7 @@ export default function Map({ onOpenNav }) {
     });
     return null;
   };
+  /////
   //一開始進來的時候 啟動api fetch
   useEffect(() => {
     fetch(api)
@@ -62,13 +61,7 @@ export default function Map({ onOpenNav }) {
     //mapRef.current.fitBounds(geojsonRef.current?.getBounds());
   }, [isMapReady, jsonContent]);
 
-  const handleMouseOver = (index) => {
-    setShowLine({ [index]: true });
-  };
 
-  const handleMouseOut = (index) => {
-    setShowLine({ [index]: false });
-  };
   let svgIcon = new L.Icon({
     iconUrl: stationsvg,
     iconSize: [27, 27], // size of the icon
@@ -80,8 +73,8 @@ export default function Map({ onOpenNav }) {
     return L.marker(latlng, {
       icon: L.icon({
         iconUrl: stationsvg,
-        iconSize: [27, 27], // size of the icon
-        iconAnchor: [14, 15],
+        "iconSize": [30,30],
+        "iconAnchor": [9, 8]
       }),
     });
   }, []);
@@ -126,7 +119,7 @@ export default function Map({ onOpenNav }) {
         ) : (
           <>
             {jsonContent.features.map((feature, index) => {
-              console.log(...feature.geometry.coordinates[0])
+              
               return (
                 <React.Fragment key={index}>
                   <GeoJSON
@@ -142,12 +135,12 @@ export default function Map({ onOpenNav }) {
                           },
                         },
                       ],
-                    }}
+                    }}/>
+                  
+                  <GeoJSON
+                    data={{ type: "FeatureCollection", features: [feature] }}
+                    pathOptions={{ color: "#F2F5F5", weight: 2 }}
                   />
-                  {/*<GeoJSON*/}
-                  {/*  data={{ type: "FeatureCollection", features: [feature] }}*/}
-                  {/*  pathOptions={{ color: "#F2F5F5", weight: 1 }}*/}
-                  {/*/>*/}
                 </React.Fragment>
               );
             })}
