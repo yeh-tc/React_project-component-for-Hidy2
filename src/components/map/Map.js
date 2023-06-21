@@ -26,12 +26,11 @@ export default function Map({ onOpenNav }) {
   const [checkAPI, setcheckAPI] = useState();
   const [isMapReady, setIsMapReady] = useState(false);
 
- 
   //Ref綁在地圖上
   const mapRef = useRef();
   //Ref綁在航跡上 使用者點該航跡時 視窗會自動把航跡置中用
   const geojsonRef = useRef();
-  
+
   ////
   //showing lon/lat on map when mouse moving on map
   const [coordinates, setCoordinates] = useState(null);
@@ -61,7 +60,6 @@ export default function Map({ onOpenNav }) {
     //mapRef.current.fitBounds(geojsonRef.current?.getBounds());
   }, [isMapReady, jsonContent]);
 
-
   let svgIcon = new L.Icon({
     iconUrl: stationsvg,
     iconSize: [27, 27], // size of the icon
@@ -73,8 +71,8 @@ export default function Map({ onOpenNav }) {
     return L.marker(latlng, {
       icon: L.icon({
         iconUrl: stationsvg,
-        "iconSize": [30,30],
-        "iconAnchor": [9, 8]
+        iconSize: [30, 30],
+        iconAnchor: [9, 9],
       }),
     });
   }, []);
@@ -109,6 +107,7 @@ export default function Map({ onOpenNav }) {
         {/* 顯示航跡 */}
         {/* 資料還沒進來時 顯示loader */}
         {checkAPI !== undefined ? (
+          /*api出事的時候 checkAPI會有error message*/
           <FailApiWarning />
         ) : jsonContent === undefined ? (
           <Waiting />
@@ -119,27 +118,17 @@ export default function Map({ onOpenNav }) {
         ) : (
           <>
             {jsonContent.features.map((feature, index) => {
-              
+              console.log(hoverData);
               return (
-                <React.Fragment key={index}>
-                  <GeoJSON
-                    pointToLayer={pointToLayer}
-                    data={{
-                      type: "FeatureCollection",
-                      features: [
-                        {
-                          type: "Feature",
-                          geometry: {
-                            type: "Point",
-                            coordinates: [...feature.geometry.coordinates[0]],
-                          },
-                        },
-                      ],
-                    }}/>
-                  
+                <React.Fragment key={feature.properties.id}>
                   <GeoJSON
                     data={{ type: "FeatureCollection", features: [feature] }}
                     pathOptions={{ color: "#F2F5F5", weight: 2 }}
+                  />
+
+                  <GeoJSON
+                    data={feature.properties.bottle_sta[0]}
+                    pointToLayer={pointToLayer}
                   />
                 </React.Fragment>
               );
