@@ -11,6 +11,9 @@ const Main = styled("div")({
 
 export default function HomePage() {
   const [open, setOpen] = useState(false);
+  const [selectCruiseId, setSelectCruiseId] = useState(null);
+  const [activeCruise, setActiveCruise] = useState(null);
+  
   return (
     <>
       <Stack direction="row">
@@ -19,9 +22,17 @@ export default function HomePage() {
           onCloseNav={() => {
             setOpen(false);
           }}
+          selectCruiseId={selectCruiseId}
+          setActiveCruise={setActiveCruise}
+         
         />
         <Main>
-          <Map onOpenNav={() => setOpen(true)} />
+          <Map 
+          onOpenNav={() => setOpen(true)} 
+          setSelectCruiseId={setSelectCruiseId}
+          activeCruise={activeCruise}
+          />
+      
         </Main>
       </Stack>
     </>
