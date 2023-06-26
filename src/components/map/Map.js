@@ -8,6 +8,7 @@ import {
   GeoJSON,
   ZoomControl,
   useMapEvent,
+  Marker
 } from "react-leaflet";
 import L from "leaflet";
 import DrawerIcon from "../drawer/DrawerIcon";
@@ -15,14 +16,17 @@ import { api } from "./api";
 import NoDataWarning from "./NoDataWarning";
 import FailApiWarning from "./FailApiWarning";
 import Waiting from "./Waiting";
-import stationsvg from "./SVG/sta2.svg";
+import stationsvg from "./SVG/blue_small.svg";
+import orangesvg from "./SVG/orange_small.svg";
 
 //
 
-export default function Map({ onOpenNav }) {
+
+export default function Map({ onOpenNav, setSelectCruiseId, activeCruise  }) {
   //api 拿資料成功與否的狀況
   //也用在等待期間的loader
   const [jsonContent, setJsonContent] = useState();
+  const [apiweb, setApiweb] = useState(api);
   const [checkAPI, setcheckAPI] = useState();
   const [isMapReady, setIsMapReady] = useState(false);
 
@@ -48,33 +52,48 @@ export default function Map({ onOpenNav }) {
   /////
   //一開始進來的時候 啟動api fetch
   useEffect(() => {
+    setJsonContent();
+    setcheckAPI();
+    setSelectCruiseId(null);
+    
     fetch(api)
       .then((data) => data.json())
-      .then((data) => setJsonContent(data))
-      .catch((err) => setcheckAPI(err));
-  }, []);
-  //map準備好&有jsonContent 即啟動
+      .then((data) => {
+        setJsonContent(data);
+        const ids = data.features.map((feature) => {
+          return(
+          [{"id":feature.properties.id,
+          "departure":feature.properties.depart,
+          "return":feature.properties.return,
+          "max_depth":feature.properties.max_dep,
+          "para":feature.properties.para}]
+          )});
+        setSelectCruiseId(ids);
 
-  useEffect(() => {
-    //const coords = [...jsonContent.features[0].geometry.coordinates[0]].reverse();
-    //mapRef.current.fitBounds(geojsonRef.current?.getBounds());
-  }, [isMapReady, jsonContent]);
-
-  let svgIcon = new L.Icon({
-    iconUrl: stationsvg,
-    iconSize: [27, 27], // size of the icon
-    iconAnchor: [14, 15], // point of the icon which will correspond to marker's location
-    popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
-  });
+      })
+      .catch((err) => {
+        setcheckAPI(err);
+      });
+  }, [apiweb]);
 
   const pointToLayer = useCallback((feature, latlng) => {
     return L.marker(latlng, {
       icon: L.icon({
         iconUrl: stationsvg,
-        iconSize: [30, 30],
-        iconAnchor: [9, 9],
+        iconSize: [12, 12],
+        iconAnchor: [5.6, 7],
       }),
     });
+  }, [activeCruise]);
+
+ 
+  const onEachFeature = useCallback((feature, layer) => {
+    if (feature.properties) {
+      
+      const popupContent =`Date:&nbsp;${feature.properties.date}<br/>Station:&nbsp;${feature.properties.station}<br/>`
+      layer.bindTooltip(popupContent);
+      
+    }
   }, []);
 
   return (
@@ -118,18 +137,31 @@ export default function Map({ onOpenNav }) {
         ) : (
           <>
             {jsonContent.features.map((feature, index) => {
-              console.log(hoverData);
+              const isActive = activeCruise === feature.properties.id;
               return (
                 <React.Fragment key={feature.properties.id}>
                   <GeoJSON
                     data={{ type: "FeatureCollection", features: [feature] }}
-                    pathOptions={{ color: "#F2F5F5", weight: 2 }}
+                    pathOptions={{ color:isActive ? "#E28232" : "#6FBCD8" , weight: 2 }}
                   />
 
                   <GeoJSON
                     data={feature.properties.bottle_sta[0]}
                     pointToLayer={pointToLayer}
+                    onEachFeature={onEachFeature}
                   />
+                  {feature.properties.bottle_sta[0].features.map((object,index)=>{
+                    return(
+                      <Marker position={[object.geometry.coordinates[1],object.geometry.coordinates[0]]}
+                      icon={L.icon({
+                        iconUrl: activeCruise === feature.properties.id ? orangesvg : stationsvg,
+                        iconSize: [12, 12],
+                        iconAnchor: [5.6, 7],
+                      })} />
+                    )
+                  })}
+                  
+                 
                 </React.Fragment>
               );
             })}
