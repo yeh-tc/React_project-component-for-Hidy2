@@ -18,7 +18,7 @@ export default function Waiting() {
       alignItems: "center",
     }}
   >
-    <CircularProgress color="secondary" />
+    <CircularProgress sx={{color:"#EB862F"}} />
   </Box>
   );
 }
