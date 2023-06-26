@@ -16,20 +16,20 @@ import { api } from "./api";
 import NoDataWarning from "./NoDataWarning";
 import FailApiWarning from "./FailApiWarning";
 import Waiting from "./Waiting";
-import stationsvg from "./SVG/blue_small.svg";
-import orangesvg from "./SVG/orange_small.svg";
+import stationsvg from "./SVG/blue_small_1.svg";
+import orangesvg from "./SVG/orange_small_1.svg";
 
 //
 
 
-export default function Map({ onOpenNav, setSelectCruiseId, activeCruise  }) {
+export default function Map({ onOpenNav, setSelectCruiseId, activeCruise, setActiveCruise }) {
   //api 拿資料成功與否的狀況
   //也用在等待期間的loader
   const [jsonContent, setJsonContent] = useState();
   const [apiweb, setApiweb] = useState(api);
   const [checkAPI, setcheckAPI] = useState();
   const [isMapReady, setIsMapReady] = useState(false);
-
+  
   //Ref綁在地圖上
   const mapRef = useRef();
   //Ref綁在航跡上 使用者點該航跡時 視窗會自動把航跡置中用
@@ -76,26 +76,17 @@ export default function Map({ onOpenNav, setSelectCruiseId, activeCruise  }) {
       });
   }, [apiweb]);
 
-  const pointToLayer = useCallback((feature, latlng) => {
-    return L.marker(latlng, {
-      icon: L.icon({
-        iconUrl: stationsvg,
-        iconSize: [12, 12],
-        iconAnchor: [5.6, 7],
-      }),
-    });
-  }, [activeCruise]);
 
  
   const onEachFeature = useCallback((feature, layer) => {
     if (feature.properties) {
       
       const popupContent =`Date:&nbsp;${feature.properties.date}<br/>Station:&nbsp;${feature.properties.station}<br/>`
-      layer.bindTooltip(popupContent);
+      layer.bindPupup(popupContent);
       
     }
   }, []);
-
+  
   return (
     <Container disableGutters maxWidth="100%" sx={{ mx: 0 }}>
       <MapContainer
@@ -138,26 +129,34 @@ export default function Map({ onOpenNav, setSelectCruiseId, activeCruise  }) {
           <>
             {jsonContent.features.map((feature, index) => {
               const isActive = activeCruise === feature.properties.id;
+              
               return (
                 <React.Fragment key={feature.properties.id}>
                   <GeoJSON
                     data={{ type: "FeatureCollection", features: [feature] }}
                     pathOptions={{ color:isActive ? "#E28232" : "#6FBCD8" , weight: 2 }}
+                    eventHandlers={{
+                      mouseover: () => setActiveCruise(feature.properties.id),
+                      mouseout: ()=> setActiveCruise(null),
+                     
+                    }}
                   />
 
-                  <GeoJSON
-                    data={feature.properties.bottle_sta[0]}
-                    pointToLayer={pointToLayer}
-                    onEachFeature={onEachFeature}
-                  />
+                 
                   {feature.properties.bottle_sta[0].features.map((object,index)=>{
                     return(
-                      <Marker position={[object.geometry.coordinates[1],object.geometry.coordinates[0]]}
-                      icon={L.icon({
+                      <Marker key={index} position={[object.geometry.coordinates[1],object.geometry.coordinates[0]]}
+                        icon={L.icon({
                         iconUrl: activeCruise === feature.properties.id ? orangesvg : stationsvg,
                         iconSize: [12, 12],
                         iconAnchor: [5.6, 7],
-                      })} />
+                       })}
+                       eventHandlers={{
+                        mouseover: () => setActiveCruise(feature.properties.id),
+                        mouseout: ()=> setActiveCruise(null),
+                        
+                      }}
+                        />
                     )
                   })}
                   
