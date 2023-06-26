@@ -1,3 +1,3 @@
-## Chemistry Diver website for ODB
+## Chemistry component for ODB Hidy2
 
-React/Material UI + Flask
+React/Material UI
