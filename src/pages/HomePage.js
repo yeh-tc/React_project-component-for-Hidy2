@@ -13,7 +13,7 @@ export default function HomePage() {
   const [open, setOpen] = useState(false);
   const [selectCruiseId, setSelectCruiseId] = useState(null);
   const [activeCruise, setActiveCruise] = useState(null);
-  
+ 
   return (
     <>
       <Stack direction="row">
@@ -24,6 +24,7 @@ export default function HomePage() {
           }}
           selectCruiseId={selectCruiseId}
           setActiveCruise={setActiveCruise}
+          activeCruise={activeCruise}
          
         />
         <Main>
@@ -31,6 +32,7 @@ export default function HomePage() {
           onOpenNav={() => setOpen(true)} 
           setSelectCruiseId={setSelectCruiseId}
           activeCruise={activeCruise}
+          setActiveCruise={setActiveCruise}
           />
       
         </Main>
