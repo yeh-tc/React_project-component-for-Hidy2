@@ -15,13 +15,13 @@ import { useState } from "react";
 import CruiseInfo from "./CruiseInfo";
 const nav_width = 280;
 
-export default function Drawers({ openNav, onCloseNav, selectCruiseId, setActiveCruise  }) {
+export default function Drawers({ openNav, onCloseNav, selectCruiseId, setActiveCruise, activeCruise  }) {
   const isDesktop = useResponsive("up", "md");
-  const [open, setOpen] = useState(false);
+  const [opentext, setOpentext] = useState(false);
   const handleClick = (index) => {
-    setOpen({
-      ...open,
-      [index]: !open[index],
+    setOpentext({
+      ...opentext,
+      [index]: !opentext[index],
     });
   };
   const renderContent = (
@@ -53,7 +53,7 @@ export default function Drawers({ openNav, onCloseNav, selectCruiseId, setActive
         {selectCruiseId !== null &&
           selectCruiseId.map((text, index) => (
             <React.Fragment key={index}>
-              <CruiseInfo index={index} text={text} open={open} handleClick ={()=>handleClick(index)} setActiveCruise={setActiveCruise} />
+              <CruiseInfo index={index} text={text} open={opentext} handleClick ={()=>handleClick(index)} setActiveCruise={setActiveCruise} activeCruise={activeCruise}/>
             </React.Fragment>
           ))}
       </List>
