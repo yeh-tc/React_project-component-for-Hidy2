@@ -9,12 +9,7 @@ import Container from "@mui/material/Container";
 
 let theme = createTheme({
   palette: {
-    primary: {
-      main: '#2e727f',
-    },
-    secondary: {
-      main: '#ffa000',
-    },
+    
     text: {
       primary:'#565360',
       secondary:'#908E9B',
