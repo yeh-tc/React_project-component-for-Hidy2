@@ -19,8 +19,6 @@ export default function CruiseInfo({
     let validJsonString = text[0].para.replace(/'/g, '"');
     let paraArray = JSON.parse(validJsonString);
     const isHovered = activeHover === text[0].id
-    
-    
   return (
     <>
       <ListItemButton
@@ -40,6 +38,12 @@ export default function CruiseInfo({
       </ListItemButton>
       <Collapse in={open[index]} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
+        <ListItemText sx={{ pl: 9 }}>
+            <Typography>
+              <b>Leader:</b>
+              <br /> {text[0].pi}
+            </Typography>
+          </ListItemText>
           <ListItemText sx={{ pl: 9 }}>
             <Typography>
               <b>Deaparture Date:</b>
