@@ -79,6 +79,7 @@ export default function Map({
                 return: feature.properties.return,
                 max_depth: feature.properties.max_dep,
                 para: feature.properties.para,
+                pi:feature.properties.pi
               },
             ];
           });
