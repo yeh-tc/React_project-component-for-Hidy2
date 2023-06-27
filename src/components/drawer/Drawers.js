@@ -47,7 +47,6 @@ export default function Drawers({
     } else if (activeClick !== null) {
       const index = idList.indexOf(activeClick);
       if (index !== -1) {
-        console.log(`activeClick is at index ${index} in idList.`);
         //因為只想允許同時間一個打開
         let newOpenText = {};
         idList.forEach((id, i) => {
