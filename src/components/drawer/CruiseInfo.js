@@ -13,23 +13,23 @@ export default function CruiseInfo({
   text,
   open,
   handleClick,
-  setActiveCruise,
-  activeCruise
+  activeHover,
+  setActiveHover
 }) {
     let validJsonString = text[0].para.replace(/'/g, '"');
     let paraArray = JSON.parse(validJsonString);
-    const isHovered = activeCruise === text[0].id
+    const isHovered = activeHover === text[0].id
     
     
   return (
     <>
       <ListItemButton
         onClick={() => handleClick(index)}
-        onMouseEnter={() => setActiveCruise(text[0].id)}
-        onMouseLeave={() => setActiveCruise(null)}
-        sx={{ color: isHovered? '#EB862F':"#42a5f5",'&:hover':{color:'#EB862F'}}}
+        onMouseEnter={() => setActiveHover(text[0].id)}
+        onMouseLeave={() => setActiveHover(null)}
+        sx={{ color: isHovered? '#EB862F':"#1976d2"}}
       >
-        <ListItemIcon  sx={{ color: "#42a5f5"}}>
+        <ListItemIcon  sx={{ color: "#1976d2"}}>
           <AnchorIcon />
         </ListItemIcon>
         <ListItemText >
