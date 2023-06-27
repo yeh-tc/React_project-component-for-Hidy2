@@ -1,6 +1,6 @@
 import "../../../node_modules/leaflet/dist/leaflet.css";
 import React from "react";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Container, Box } from "@mui/material";
 import {
   MapContainer,
@@ -8,32 +8,34 @@ import {
   GeoJSON,
   ZoomControl,
   useMapEvent,
-  Marker
 } from "react-leaflet";
-import L from "leaflet";
+
 import DrawerIcon from "../drawer/DrawerIcon";
 import { api } from "./api";
 import NoDataWarning from "./NoDataWarning";
 import FailApiWarning from "./FailApiWarning";
 import Waiting from "./Waiting";
-import stationsvg from "./SVG/blue_small_1.svg";
-import orangesvg from "./SVG/orange_small_1.svg";
-
+import MapMarker from "./MapMarker";
 //
 
-
-export default function Map({ onOpenNav, setSelectCruiseId, activeCruise, setActiveCruise }) {
+export default function Map({
+  onOpenNav,
+  setCruiseIdinDrawer,
+  activeClick,
+  activeHover,
+  setActiveClick,
+  setActiveHover,
+}) {
   //api 拿資料成功與否的狀況
   //也用在等待期間的loader
   const [jsonContent, setJsonContent] = useState();
   const [apiweb, setApiweb] = useState(api);
   const [checkAPI, setcheckAPI] = useState();
   const [isMapReady, setIsMapReady] = useState(false);
-  
+
   //Ref綁在地圖上
   const mapRef = useRef();
   //Ref綁在航跡上 使用者點該航跡時 視窗會自動把航跡置中用
-  const geojsonRef = useRef();
 
   ////
   //showing lon/lat on map when mouse moving on map
@@ -54,39 +56,52 @@ export default function Map({ onOpenNav, setSelectCruiseId, activeCruise, setAct
   useEffect(() => {
     setJsonContent();
     setcheckAPI();
-    setSelectCruiseId(null);
-    
+    setCruiseIdinDrawer(null);
+    setActiveClick(null);
+    setActiveHover(null);
+
     fetch(api)
       .then((data) => data.json())
       .then((data) => {
         setJsonContent(data);
-        const ids = data.features.map((feature) => {
-          return(
-          [{"id":feature.properties.id,
-          "departure":feature.properties.depart,
-          "return":feature.properties.return,
-          "max_depth":feature.properties.max_dep,
-          "para":feature.properties.para}]
-          )});
-        setSelectCruiseId(ids);
-
+        if (data != "No result") {
+          const ids_in_drawers = data.features.map((feature) => {
+            return [
+              {
+                id: feature.properties.id,
+                departure: feature.properties.depart,
+                return: feature.properties.return,
+                max_depth: feature.properties.max_dep,
+                para: feature.properties.para,
+              },
+            ];
+          });
+          setCruiseIdinDrawer(ids_in_drawers);
+        }
       })
       .catch((err) => {
         setcheckAPI(err);
       });
   }, [apiweb]);
 
+  const onEachFeature = (feature, layer) => {
+    layer.on({
+      mouseover: () => {
+        setActiveHover(feature.properties.id);
+        layer.bindTooltip(feature.properties.id, {
+          className: "marker-tooltip",
+        });
+      },
+      mouseout: () => {
+        setActiveHover(null);
+      },
+      click: () => {
+        setActiveClick(feature.properties.id);
+        mapRef.current.fitBounds(layer._bounds);
+      },
+    });
+  };
 
- 
-  const onEachFeature = useCallback((feature, layer) => {
-    if (feature.properties) {
-      
-      const popupContent =`Date:&nbsp;${feature.properties.date}<br/>Station:&nbsp;${feature.properties.station}<br/>`
-      layer.bindPupup(popupContent);
-      
-    }
-  }, []);
-  
   return (
     <Container disableGutters maxWidth="100%" sx={{ mx: 0 }}>
       <MapContainer
@@ -128,39 +143,41 @@ export default function Map({ onOpenNav, setSelectCruiseId, activeCruise, setAct
         ) : (
           <>
             {jsonContent.features.map((feature, index) => {
-              const isActive = activeCruise === feature.properties.id;
-              
+              const isHovered = activeHover === feature.properties.id;
+              const isClicked = activeClick === feature.properties.id;
+
               return (
                 <React.Fragment key={feature.properties.id}>
                   <GeoJSON
                     data={{ type: "FeatureCollection", features: [feature] }}
-                    pathOptions={{ color:isActive ? "#E28232" : "#6FBCD8" , weight: 2 }}
-                    eventHandlers={{
-                      mouseover: () => setActiveCruise(feature.properties.id),
-                      mouseout: ()=> setActiveCruise(null),
-                     
+                    pathOptions={{
+                      color: isClicked
+                        ? "#F2F5F5"
+                        : isHovered
+                        ? "#EB862F"
+                        : "#6FBCD8",
+                      weight: 4,
                     }}
+                    onEachFeature={onEachFeature}
                   />
 
-                 
-                  {feature.properties.bottle_sta[0].features.map((object,index)=>{
-                    return(
-                      <Marker key={index} position={[object.geometry.coordinates[1],object.geometry.coordinates[0]]}
-                        icon={L.icon({
-                        iconUrl: activeCruise === feature.properties.id ? orangesvg : stationsvg,
-                        iconSize: [12, 12],
-                        iconAnchor: [5.6, 7],
-                       })}
-                       eventHandlers={{
-                        mouseover: () => setActiveCruise(feature.properties.id),
-                        mouseout: ()=> setActiveCruise(null),
-                        
-                      }}
+                  {feature.properties.bottle_sta[0].features.map(
+                    (object, index) => {
+                      const isHovered = activeHover === feature.properties.id;
+                      const isClicked = activeClick === feature.properties.id;
+
+                      return (
+                        <MapMarker
+                          key={index}
+                          object={object}
+                          isHovered={isHovered}
+                          isClicked={isClicked}
+                          id={feature.properties.id}
+                          setActiveHover={setActiveHover}
                         />
-                    )
-                  })}
-                  
-                 
+                      );
+                    }
+                  )}
                 </React.Fragment>
               );
             })}
