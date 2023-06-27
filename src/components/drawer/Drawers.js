@@ -1,29 +1,62 @@
-import {
-  Box,
-  Drawer,
-  Divider,
-  List,
-  Typography,
-} from "@mui/material";
+import { Box, Drawer, Divider, List, Typography } from "@mui/material";
 import React from "react";
 import useResponsive from "../../hooks/useResponsive";
 import Scrollbar from "../scrollbar/Scrollbar";
 import Logo from "../logoname/Logo";
 import SelectCruise from "../filter/SelectCruise";
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import CruiseInfo from "./CruiseInfo";
 const nav_width = 280;
 
-export default function Drawers({ openNav, onCloseNav, selectCruiseId, setActiveCruise, activeCruise  }) {
+export default function Drawers({
+  openNav,
+  onCloseNav,
+  cruiseIdinDrawer,
+  activeHover,
+  activeClick,
+  setActiveClick,
+  setActiveHover,
+}) {
   const isDesktop = useResponsive("up", "md");
   const [opentext, setOpentext] = useState(false);
-  const handleClick = (index) => {
-    setOpentext({
-      ...opentext,
-      [index]: !opentext[index],
-    });
+  const [idList, setIdList] = useState([]);
+  const handleClick = (index, id, wasopen) => {
+    setOpentext(prevOpentext =>({
+      ...prevOpentext,
+      [index]: !prevOpentext[index],
+    }));
+    if(wasopen!=true){
+      setActiveClick(id)
+    }else if(wasopen==true){
+      setActiveClick(null)
+    }
   };
+ 
+//做一個id list
+useEffect(() => {
+  if(cruiseIdinDrawer != null){
+    const newIdList = cruiseIdinDrawer.map((data) => data[0].id);
+    setIdList(newIdList);
+  }
+}, [cruiseIdinDrawer]);
+//看active的航次是在drawer的第幾個index 要把collapse打開
+useEffect(() => {
+  if (activeClick !== null) {
+    const index = idList.indexOf(activeClick);
+    if (index !== -1) {
+      console.log(`activeClick is at index ${index} in idList.`);
+      //因為只想允許同時間一個打開
+      let newOpenText = {};
+      idList.forEach((id, i) => {
+        newOpenText[i] = i === index;
+      });
+      setOpentext(newOpenText);
+      
+    } 
+  }
+}, [activeClick, idList]);
+
   const renderContent = (
     <Scrollbar
       sx={{
@@ -50,10 +83,18 @@ export default function Drawers({ openNav, onCloseNav, selectCruiseId, setActive
         sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
         component="nav"
       >
-        {selectCruiseId !== null &&
-          selectCruiseId.map((text, index) => (
+        {cruiseIdinDrawer !== null &&
+          cruiseIdinDrawer.map((text, index) => (
             <React.Fragment key={index}>
-              <CruiseInfo index={index} text={text} open={opentext} handleClick ={()=>handleClick(index)} setActiveCruise={setActiveCruise} activeCruise={activeCruise}/>
+              <CruiseInfo
+                index={index}
+                text={text}
+                open={opentext}
+                handleClick={() => handleClick(index, text[0].id,opentext[index] )}
+                activeHover={activeHover}
+                activeClick={activeClick}
+                setActiveHover={setActiveHover}
+              />
             </React.Fragment>
           ))}
       </List>
