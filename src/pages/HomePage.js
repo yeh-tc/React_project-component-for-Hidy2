@@ -11,8 +11,9 @@ const Main = styled("div")({
 
 export default function HomePage() {
   const [open, setOpen] = useState(false);
-  const [selectCruiseId, setSelectCruiseId] = useState(null);
-  const [activeCruise, setActiveCruise] = useState(null);
+  const [cruiseIdinDrawer, setCruiseIdinDrawer] = useState(null);
+  const [activeHover, setActiveHover] = useState(null);
+  const [activeClick, setActiveClick] = useState(null);
  
   return (
     <>
@@ -22,17 +23,21 @@ export default function HomePage() {
           onCloseNav={() => {
             setOpen(false);
           }}
-          selectCruiseId={selectCruiseId}
-          setActiveCruise={setActiveCruise}
-          activeCruise={activeCruise}
+          cruiseIdinDrawer={cruiseIdinDrawer}
+          activeHover={activeHover}
+          activeClick={activeClick}
+          setActiveClick={setActiveClick}
+          setActiveHover={setActiveHover}
          
         />
         <Main>
           <Map 
           onOpenNav={() => setOpen(true)} 
-          setSelectCruiseId={setSelectCruiseId}
-          activeCruise={activeCruise}
-          setActiveCruise={setActiveCruise}
+          setCruiseIdinDrawer={setCruiseIdinDrawer}
+          activeHover={activeHover}
+          activeClick={activeClick}
+          setActiveClick={setActiveClick}
+          setActiveHover={setActiveHover}
           />
       
         </Main>
