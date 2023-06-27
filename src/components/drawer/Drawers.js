@@ -5,7 +5,7 @@ import Scrollbar from "../scrollbar/Scrollbar";
 import Logo from "../logoname/Logo";
 import SelectCruise from "../filter/SelectCruise";
 
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import CruiseInfo from "./CruiseInfo";
 const nav_width = 280;
 
@@ -22,40 +22,41 @@ export default function Drawers({
   const [opentext, setOpentext] = useState(false);
   const [idList, setIdList] = useState([]);
   const handleClick = (index, id, wasopen) => {
-    setOpentext(prevOpentext =>({
+    setOpentext((prevOpentext) => ({
       ...prevOpentext,
       [index]: !prevOpentext[index],
     }));
-    if(wasopen!=true){
-      setActiveClick(id)
-    }else if(wasopen==true){
-      setActiveClick(null)
+    if (wasopen !== true) {
+      setActiveClick(id);
+    } else if (wasopen === true) {
+      setActiveClick(null);
     }
   };
- 
-//做一個id list
-useEffect(() => {
-  if(cruiseIdinDrawer != null){
-    const newIdList = cruiseIdinDrawer.map((data) => data[0].id);
-    setIdList(newIdList);
-  }
-}, [cruiseIdinDrawer]);
-//看active的航次是在drawer的第幾個index 要把collapse打開
-useEffect(() => {
-  if (activeClick !== null) {
-    const index = idList.indexOf(activeClick);
-    if (index !== -1) {
-      console.log(`activeClick is at index ${index} in idList.`);
-      //因為只想允許同時間一個打開
-      let newOpenText = {};
-      idList.forEach((id, i) => {
-        newOpenText[i] = i === index;
-      });
-      setOpentext(newOpenText);
-      
-    } 
-  }
-}, [activeClick, idList]);
+
+  //做一個id list
+  useEffect(() => {
+    if (cruiseIdinDrawer != null) {
+      const newIdList = cruiseIdinDrawer.map((data) => data[0].id);
+      setIdList(newIdList);
+    }
+  }, [cruiseIdinDrawer]);
+  //看active的航次是在drawer的第幾個index 要把collapse打開
+  useEffect(() => {
+    if (activeClick === null) {
+      setOpentext(false);
+    } else if (activeClick !== null) {
+      const index = idList.indexOf(activeClick);
+      if (index !== -1) {
+        console.log(`activeClick is at index ${index} in idList.`);
+        //因為只想允許同時間一個打開
+        let newOpenText = {};
+        idList.forEach((id, i) => {
+          newOpenText[i] = i === index;
+        });
+        setOpentext(newOpenText);
+      }
+    }
+  }, [activeClick, idList]);
 
   const renderContent = (
     <Scrollbar
@@ -90,7 +91,9 @@ useEffect(() => {
                 index={index}
                 text={text}
                 open={opentext}
-                handleClick={() => handleClick(index, text[0].id,opentext[index] )}
+                handleClick={() =>
+                  handleClick(index, text[0].id, opentext[index])
+                }
                 activeHover={activeHover}
                 activeClick={activeClick}
                 setActiveHover={setActiveHover}
