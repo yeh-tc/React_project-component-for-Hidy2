@@ -9,7 +9,7 @@ import {
   ZoomControl,
   useMapEvent,
 } from "react-leaflet";
-
+import L from "leaflet";
 import DrawerIcon from "../drawer/DrawerIcon";
 import { api } from "./api";
 import NoDataWarning from "./NoDataWarning";
@@ -26,18 +26,21 @@ export default function Map({
   setActiveClick,
   setActiveHover,
 }) {
-  //api 拿資料成功與否的狀況
-  //也用在等待期間的loader
-  const [jsonContent, setJsonContent] = useState();
-  const [apiweb, setApiweb] = useState(api);
+ 
+  //api網址
+  const [apiUrl, setApiUrl] = useState(api);
+  //檢查api server是否出錯
   const [checkAPI, setcheckAPI] = useState();
+  //檢查api連接成功後，返回的資料結果，沒資料="No results"，有資料會是json
+  const [jsonContent, setJsonContent] = useState();
+  //地圖
   const [isMapReady, setIsMapReady] = useState(false);
 
   //Ref綁在地圖上
   const mapRef = useRef();
-  //Ref綁在航跡上 使用者點該航跡時 視窗會自動把航跡置中用
-
-  ////
+  
+  ////////////////////////////////////////////////////////////
+  ////地圖右下角小窗格(可刪除 Hidy2已有)
   //showing lon/lat on map when mouse moving on map
   const [coordinates, setCoordinates] = useState(null);
 
@@ -51,9 +54,11 @@ export default function Map({
     });
     return null;
   };
-  /////
-  //一開始進來的時候 啟動api fetch
+  ////////////////////////////////////////////////////////////
+  //
+  //當api網址改變即啟動
   useEffect(() => {
+    //把之前的資料洗掉和state恢復
     setJsonContent();
     setcheckAPI();
     setCruiseIdinDrawer(null);
@@ -64,7 +69,8 @@ export default function Map({
       .then((data) => data.json())
       .then((data) => {
         setJsonContent(data);
-        if (data != "No result") {
+        if (data !== "No result") {
+          //放進Drawer內的文字
           const ids_in_drawers = data.features.map((feature) => {
             return [
               {
@@ -77,13 +83,28 @@ export default function Map({
             ];
           });
           setCruiseIdinDrawer(ids_in_drawers);
+          //依api搜尋結果，讓Map fit全部GeoJson的Bounds
         }
       })
       .catch((err) => {
         setcheckAPI(err);
       });
-  }, [apiweb]);
-
+  }, [apiUrl]);
+  //依api搜尋結果，讓Map fit全部GeoJson的Bounds
+  useEffect(() => {
+    if (isMapReady && jsonContent && jsonContent !== 'No result') {
+      let bounds = new L.LatLngBounds();
+      jsonContent.features.forEach(feature => {
+        let featureBounds = L.geoJSON(feature).getBounds();
+        bounds.extend(featureBounds);
+      });
+  
+      if (mapRef.current) {
+        mapRef.current.fitBounds(bounds);
+      }
+    }
+  }, [isMapReady, jsonContent]);
+  //放在航跡GeoJson上的eventhandler
   const onEachFeature = (feature, layer) => {
     layer.on({
       mouseover: () => {
@@ -97,6 +118,7 @@ export default function Map({
       },
       click: () => {
         setActiveClick(feature.properties.id);
+        //單個GeoJson物件置中於地圖
         mapRef.current.fitBounds(layer._bounds);
       },
     });
