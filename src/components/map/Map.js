@@ -10,9 +10,9 @@ import {
   useMapEvent,
   Pane,
 } from "react-leaflet";
+import { api } from "./api";
 import L from "leaflet";
 import DrawerIcon from "../drawer/DrawerIcon";
-import { api } from "./api";
 import NoDataWarning from "./NoDataWarning";
 import FailApiWarning from "./FailApiWarning";
 import Waiting from "./Waiting";
@@ -26,18 +26,24 @@ export default function Map({
   activeHover,
   setActiveClick,
   setActiveHover,
+  lon1,
+  lon2,
+  lat1,
+  lat2,
+  time1,
+  time2,
+  rv,
+  parameter,
 }) {
-  //api網址
-  const [apiUrl, setApiUrl] = useState(api);
   //檢查api server是否出錯
   const [checkAPI, setcheckAPI] = useState();
-  //檢查api連接成功後，返回的資料結果，沒資料="No results"，有資料會是json
+  //檢查api連接成功後，返回的資料結果(沒資料="No results"，有資料會是json)
   const [jsonContent, setJsonContent] = useState();
   //地圖
   const [isMapReady, setIsMapReady] = useState(false);
-
   //Ref綁在地圖上
   const mapRef = useRef();
+  //
 
   ////////////////////////////////////////////////////////////
   ////地圖右下角小窗格(可刪除 Hidy2已有)
@@ -56,41 +62,36 @@ export default function Map({
   };
   ////////////////////////////////////////////////////////////
   //
-  //當api網址改變即啟動
+  //當filter參數改變 啟動api網址改變
   useEffect(() => {
-    //把之前的資料洗掉和state恢復
+    const api_address = `${api}lat_from=${lat1}&lat_to=${lat2}&lon_from=${lon1}&lon_to=${lon2}&date_from=${time1}&date_to=${time2}&RV=${rv}&var=${parameter}`;
     setJsonContent();
     setcheckAPI();
     setCruiseIdinDrawer(null);
     setActiveClick(null);
     setActiveHover(null);
 
-    fetch(api)
+    fetch(api_address)
       .then((data) => data.json())
       .then((data) => {
-        setJsonContent(data)
+        setJsonContent(data);
         if (data !== "No result") {
-          //放進Drawer內的文字
-          const ids_in_drawers = data.features.map((feature) => {
-            return [
-              {
-                id: feature.properties.id,
-                departure: feature.properties.depart,
-                return: feature.properties.return,
-                max_depth: feature.properties.max_dep,
-                para: feature.properties.para,
-                pi: feature.properties.pi,
-              },
-            ];
-          });
+          const ids_in_drawers = data.features.map((feature) => ({
+            id: feature.properties.id,
+            departure: feature.properties.depart,
+            return: feature.properties.return,
+            max_depth: feature.properties.max_dep,
+            para: feature.properties.para,
+            pi: feature.properties.pi,
+          }));
           setCruiseIdinDrawer(ids_in_drawers);
-        
         }
       })
       .catch((err) => {
         setcheckAPI(err);
       });
-  }, [apiUrl]);
+  }, [lon1, lon2, lat1, lat2, time1, time2, rv, parameter]);
+
   //依api搜尋結果，讓Map fit全部GeoJson的Bounds
   useEffect(() => {
     if (isMapReady && jsonContent && jsonContent !== "No result") {
@@ -119,15 +120,12 @@ export default function Map({
       },
       click: () => {
         setActiveClick(feature.properties.id);
-        
+
         //單個GeoJson物件置中於地圖
         mapRef.current.fitBounds(layer._bounds);
       },
     });
   };
- 
-
-   
 
   return (
     <Container disableGutters maxWidth="100%" sx={{ mx: 0 }}>
@@ -172,24 +170,23 @@ export default function Map({
             {jsonContent.features.map((feature, index) => {
               const isHovered = activeHover === feature.properties.id;
               const isClicked = activeClick === feature.properties.id;
-              
+
               return (
                 <React.Fragment key={feature.properties.id}>
-                <Pane style={{ zIndex: isClicked ? 1000 : 500 }}>
-                  <GeoJSON
-                    data={{ type: "FeatureCollection", features: [feature] }}
-                    pathOptions={{
-                      color: isClicked
-                        ? "#F2F5F5"
-                        : isHovered
-                        ? "#EB862F"
-                        : "#6FBCD8",
-                      weight: 4,
-                    }}
-                    onEachFeature={onEachFeature}
-                    
-                  />
-                   </Pane>
+                  <Pane style={{ zIndex: isClicked ? 1000 : 500 }}>
+                    <GeoJSON
+                      data={{ type: "FeatureCollection", features: [feature] }}
+                      pathOptions={{
+                        color: isClicked
+                          ? "#F2F5F5"
+                          : isHovered
+                          ? "#EB862F"
+                          : "#6FBCD8",
+                        weight: 4,
+                      }}
+                      onEachFeature={onEachFeature}
+                    />
+                  </Pane>
 
                   {feature.properties.bottle_sta[0].features.map(
                     (object, index) => {
@@ -205,7 +202,7 @@ export default function Map({
                       );
                     }
                   )}
-               </React.Fragment>
+                </React.Fragment>
               );
             })}
           </>
