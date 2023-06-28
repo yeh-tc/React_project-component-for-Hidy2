@@ -51,7 +51,7 @@ body {
 }
 /*地圖右下角顯示tile layer的出處*/
 .leaflet-control-attribution.leaflet-control{
-  padding: 0px 29px;
+  padding: 0px 27.5px;
 }
 /*地圖左上角打開filter的按鈕*/
 .filtericon_draweropen{
