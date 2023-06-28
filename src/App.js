@@ -2,9 +2,6 @@ import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
 import { ThemeProvider, createTheme, responsiveFontSizes } from '@mui/material/styles';
 import FeedPage from "./pages/FeedPage";
 import HomePage from "./pages/HomePage";
-import ExplorePage from "./pages/ExplorePage";
-import LoginPage from "./pages/LoginPage";
-import CruisePage from "./pages/CruisePage"
 import Container from "@mui/material/Container";
 
 let theme = createTheme({
@@ -38,9 +35,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<FeedPage />} />
         <Route path="/home" element={<HomePage />} />
-        <Route path="/explore" element={<ExplorePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/cruise/:crusiename" element={<CruisePage />}/>
+        {/*<Route path="/cruise/:crusiename" element={<CruisePage />}/>*/}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       
