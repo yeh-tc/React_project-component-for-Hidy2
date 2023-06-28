@@ -110,9 +110,9 @@ export default function Map({
     layer.on({
       mouseover: () => {
         setActiveHover(feature.properties.id);
-        layer.bindTooltip(feature.properties.id, {
-          className: "marker-tooltip",
-        });
+        //layer.bindTooltip(feature.properties.id, {
+        //  className: "marker-tooltip",
+        //});
       },
       mouseout: () => {
         setActiveHover(null);
