@@ -20,21 +20,24 @@ export default function HomePage() {
   //滑鼠click到物件的航次id(Map.js和Drawers.js都可以setActiveClick)
   const [activeClick, setActiveClick] = useState(null);
   //查詢化學資料的經度1 從Drawers.js 傳到 Map.js
-  const [lon1, setLon1]=useState(0);
+  const [lon1, setLon1]=useState(106);
   //查詢化學資料的經度2 從Drawers.js 傳到 Map.js
-  const [lon2, setLon2]=useState(130);
+  const [lon2, setLon2]=useState(128);
   //查詢化學資料的緯度1 從Drawers.js 傳到 Map.js
-  const [lat1, setLat1]=useState(-60);
+  const [lat1, setLat1]=useState(3);
   //查詢化學資料的緯度2 從Drawers.js 傳到 Map.js
-  const [lat2, setLat2]=useState(60);
+  const [lat2, setLat2]=useState(33);
   //查詢化學資料的日期1 從Drawers.js 傳到 Map.js
+  //偷hidy2
   const [time1, setTime1]=useState('19950519');
   //查詢化學資料的日期2 從Drawers.js 傳到 Map.js
-  const [time2, setTime2]=useState('20050519');
+  //偷hidy2
+  const [time2, setTime2]=useState('19950522');
   //查詢化學資料的船 從Drawers.js 傳到 Map.js
   const [rv, setRv]=useState('*');
   //查詢化學資料的參數 從Drawers.js 傳到 Map.js
-  const [parameter, setParameter]=useState('D.O.,NO3,NO2');
+  //偷hidy2
+  const [parameter, setParameter]=useState('');
 
  
   return (
@@ -51,7 +54,10 @@ export default function HomePage() {
           setActiveClick={setActiveClick}
           setActiveHover={setActiveHover}
           setRv={setRv}
-         
+          setLat1={setLat1}
+          setLat2={setLat2}
+          setLon1={setLon1}
+          setLon2={setLon2}
         />
         <Main>
           <Map 
