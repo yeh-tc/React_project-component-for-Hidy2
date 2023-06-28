@@ -17,6 +17,7 @@ export default function Drawers({
   activeClick,
   setActiveClick,
   setActiveHover,
+  setRv,
 }) {
   const isDesktop = useResponsive("up", "md");
   const [opentext, setOpentext] = useState(false);
@@ -36,7 +37,7 @@ export default function Drawers({
   //做一個id list
   useEffect(() => {
     if (cruiseIdinDrawer != null) {
-      const newIdList = cruiseIdinDrawer.map((data) => data[0].id);
+      const newIdList = cruiseIdinDrawer.map((data) => data.id);
       setIdList(newIdList);
     }
   }, [cruiseIdinDrawer]);
@@ -77,7 +78,7 @@ export default function Drawers({
       >
         Cruise Filter
       </Typography>
-      <SelectCruise />
+      <SelectCruise setRv={setRv}/>
       <Divider />
       <List
         sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
@@ -91,7 +92,7 @@ export default function Drawers({
                 text={text}
                 open={opentext}
                 handleClick={() =>
-                  handleClick(index, text[0].id, opentext[index])
+                  handleClick(index, text.id, opentext[index])
                 }
                 activeHover={activeHover}
                 activeClick={activeClick}
