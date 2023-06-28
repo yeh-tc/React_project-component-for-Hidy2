@@ -16,14 +16,18 @@ export default function CruiseInfo({
   activeHover,
   setActiveHover
 }) {
-    let validJsonString = text[0].para.replace(/'/g, '"');
+    
+    let validJsonString = text.para.replace(/'/g, '"');
     let paraArray = JSON.parse(validJsonString);
-    const isHovered = activeHover === text[0].id
+    const isHovered = activeHover === text.id
+    
   return (
     <>
+      {text !== undefined &&  
+      <>
       <ListItemButton
         onClick={() => handleClick(index)}
-        onMouseEnter={() => setActiveHover(text[0].id)}
+        onMouseEnter={() => setActiveHover(text.id)}
         onMouseLeave={() => setActiveHover(null)}
         sx={{ color: isHovered? '#EB862F':"#1976d2"}}
       >
@@ -32,7 +36,7 @@ export default function CruiseInfo({
         </ListItemIcon>
         <ListItemText >
           <Typography >
-            <b>{text[0].id}</b>
+            <b>{text.id}</b>
           </Typography>
         </ListItemText>
       </ListItemButton>
@@ -41,24 +45,24 @@ export default function CruiseInfo({
         <ListItemText sx={{ pl: 9 }}>
             <Typography>
               <b>Leader:</b>
-              <br /> {text[0].pi}
+              <br /> {text.pi}
             </Typography>
           </ListItemText>
           <ListItemText sx={{ pl: 9 }}>
             <Typography>
               <b>Deaparture Date:</b>
-              <br /> {text[0].departure}
+              <br /> {text.departure}
             </Typography>
           </ListItemText>
           <ListItemText sx={{ pl: 9 }}>
             <b>Return Date:</b>
-            <br /> {text[0].return}
+            <br /> {text.return}
           </ListItemText>
           <ListItemText sx={{ pl: 9 }}>
             <b>Max Depth:</b>
-            <br /> {text[0].max_depth} m
+            <br /> {text.max_depth} m
           </ListItemText>
-          <ListItemText sx={{ pl: 9, pr: 1 }}>
+      <ListItemText sx={{ pl: 9, pr: 1 }}>
             <b>Parameter:</b>
             <br /> {paraArray.map((data) => {
                 if (data === 'NO3'){
@@ -75,6 +79,9 @@ export default function CruiseInfo({
           </ListItemText>
         </List>
       </Collapse>
+
+      </>}
+      
     </>
   );
 }
