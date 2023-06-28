@@ -4,7 +4,7 @@ import useResponsive from "../../hooks/useResponsive";
 import Scrollbar from "../scrollbar/Scrollbar";
 import Logo from "../logoname/Logo";
 import SelectCruise from "../filter/SelectCruise";
-
+import Selectbar from "../filter/Selectbar";
 import { useState, useEffect } from "react";
 import CruiseInfo from "./CruiseInfo";
 const nav_width = 280;
@@ -18,6 +18,10 @@ export default function Drawers({
   setActiveClick,
   setActiveHover,
   setRv,
+  setLat1,
+  setLat2,
+  setLon1,
+  setLon2
 }) {
   const isDesktop = useResponsive("up", "md");
   const [opentext, setOpentext] = useState(false);
@@ -78,7 +82,22 @@ export default function Drawers({
       >
         Cruise Filter
       </Typography>
-      <SelectCruise setRv={setRv}/>
+      <SelectCruise setRv={setRv} />
+      <Selectbar
+        setFunction1={setLat1}
+        setFunction2={setLat2}
+        minvalue={3}
+        maxvalue={33}
+        text={"Latitude Range 3 - 33°N"}
+      />
+      <Selectbar
+        setFunction1={setLon1}
+        setFunction2={setLon2}
+        minvalue={106}
+        maxvalue={128}
+        text={"Longitude Range 106 - 128°E"}
+      />
+      
       <Divider />
       <List
         sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
@@ -91,9 +110,7 @@ export default function Drawers({
                 index={index}
                 text={text}
                 open={opentext}
-                handleClick={() =>
-                  handleClick(index, text.id, opentext[index])
-                }
+                handleClick={() => handleClick(index, text.id, opentext[index])}
                 activeHover={activeHover}
                 activeClick={activeClick}
                 setActiveHover={setActiveHover}
