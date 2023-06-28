@@ -8,6 +8,7 @@ import {
   GeoJSON,
   ZoomControl,
   useMapEvent,
+  Pane,
 } from "react-leaflet";
 import L from "leaflet";
 import DrawerIcon from "../drawer/DrawerIcon";
@@ -26,7 +27,6 @@ export default function Map({
   setActiveClick,
   setActiveHover,
 }) {
- 
   //api網址
   const [apiUrl, setApiUrl] = useState(api);
   //檢查api server是否出錯
@@ -38,7 +38,7 @@ export default function Map({
 
   //Ref綁在地圖上
   const mapRef = useRef();
-  
+
   ////////////////////////////////////////////////////////////
   ////地圖右下角小窗格(可刪除 Hidy2已有)
   //showing lon/lat on map when mouse moving on map
@@ -68,7 +68,7 @@ export default function Map({
     fetch(api)
       .then((data) => data.json())
       .then((data) => {
-        setJsonContent(data);
+        setJsonContent(data)
         if (data !== "No result") {
           //放進Drawer內的文字
           const ids_in_drawers = data.features.map((feature) => {
@@ -79,12 +79,12 @@ export default function Map({
                 return: feature.properties.return,
                 max_depth: feature.properties.max_dep,
                 para: feature.properties.para,
-                pi:feature.properties.pi
+                pi: feature.properties.pi,
               },
             ];
           });
           setCruiseIdinDrawer(ids_in_drawers);
-          //依api搜尋結果，讓Map fit全部GeoJson的Bounds
+        
         }
       })
       .catch((err) => {
@@ -93,13 +93,13 @@ export default function Map({
   }, [apiUrl]);
   //依api搜尋結果，讓Map fit全部GeoJson的Bounds
   useEffect(() => {
-    if (isMapReady && jsonContent && jsonContent !== 'No result') {
+    if (isMapReady && jsonContent && jsonContent !== "No result") {
       let bounds = new L.LatLngBounds();
-      jsonContent.features.forEach(feature => {
+      jsonContent.features.forEach((feature) => {
         let featureBounds = L.geoJSON(feature).getBounds();
         bounds.extend(featureBounds);
       });
-  
+
       if (mapRef.current) {
         mapRef.current.fitBounds(bounds);
       }
@@ -119,11 +119,15 @@ export default function Map({
       },
       click: () => {
         setActiveClick(feature.properties.id);
+        
         //單個GeoJson物件置中於地圖
         mapRef.current.fitBounds(layer._bounds);
       },
     });
   };
+ 
+
+   
 
   return (
     <Container disableGutters maxWidth="100%" sx={{ mx: 0 }}>
@@ -168,9 +172,10 @@ export default function Map({
             {jsonContent.features.map((feature, index) => {
               const isHovered = activeHover === feature.properties.id;
               const isClicked = activeClick === feature.properties.id;
-
+              
               return (
                 <React.Fragment key={feature.properties.id}>
+                <Pane style={{ zIndex: isClicked ? 1000 : 500 }}>
                   <GeoJSON
                     data={{ type: "FeatureCollection", features: [feature] }}
                     pathOptions={{
@@ -182,13 +187,12 @@ export default function Map({
                       weight: 4,
                     }}
                     onEachFeature={onEachFeature}
+                    
                   />
+                   </Pane>
 
                   {feature.properties.bottle_sta[0].features.map(
                     (object, index) => {
-                      const isHovered = activeHover === feature.properties.id;
-                      const isClicked = activeClick === feature.properties.id;
-
                       return (
                         <MapMarker
                           key={index}
@@ -201,7 +205,7 @@ export default function Map({
                       );
                     }
                   )}
-                </React.Fragment>
+               </React.Fragment>
               );
             })}
           </>
