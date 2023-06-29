@@ -37,8 +37,8 @@ export default function MapMarker({
     <>
       <Marker
         position={[
-          object.geometry.coordinates[1],
           object.geometry.coordinates[0],
+          object.geometry.coordinates[1],
         ]}
         icon={L.icon({
           iconUrl: isClicked ? greysvg : isHovered ? orangesvg : stationsvg,
