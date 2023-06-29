@@ -32,7 +32,7 @@ export default function HomePage() {
   const [time1, setTime1]=useState('19950519');
   //查詢化學資料的日期2 從Drawers.js 傳到 Map.js
   //偷hidy2
-  const [time2, setTime2]=useState('19950522');
+  const [time2, setTime2]=useState('19960519');
   //查詢化學資料的船 從Drawers.js 傳到 Map.js
   const [rv, setRv]=useState('*');
   //查詢化學資料的參數 從Drawers.js 傳到 Map.js
