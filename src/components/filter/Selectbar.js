@@ -1,5 +1,7 @@
 import { useState } from "react";
-import {Box, Slider, Typography, Tooltip } from "@mui/material";
+import {Box, Typography } from "@mui/material";
+import Slider, { SliderThumb } from '@mui/material/Slider';
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 
 const minDistance = 1;
@@ -26,21 +28,8 @@ export default function Selectbar({
       setFunction2(value1[1]);
     }
   };
+//Slider 若加上 disableSwap valueLabelDisplay="auto" doesn't work
 
-  function ValueLabelComponent(props) {
-    const { children, value } = props;
-  
-    return (
-      <Tooltip enterTouchDelay={0} placement="top" title={value}>
-        {children}
-      </Tooltip>
-    );
-  }
-  
-  ValueLabelComponent.propTypes = {
-    children: PropTypes.element.isRequired,
-    value: PropTypes.number.isRequired,
-  };
   return (
     <>
     <Typography gutterBottom sx={{px: 3.8,color:'#908E9B',fontSize: '0.8rem',lineHeight: '1.4375em'}}>{text}</Typography>
@@ -53,12 +42,10 @@ export default function Selectbar({
         track="normal"
         marks
         onChange={handleChange1}
-        disableSwap
-        valueLabelDisplay='auto'
-        slots={{
-          valueLabel: ValueLabelComponent,
-        }}
-      />
+        
+        valueLabelDisplay="auto" 
+  />
+      
     </Box>
     </>
   );
