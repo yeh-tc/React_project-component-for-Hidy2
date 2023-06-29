@@ -9,6 +9,7 @@ import {
   ZoomControl,
   useMapEvent,
   Pane,
+  Polyline,
 } from "react-leaflet";
 import { api } from "./api";
 import L from "leaflet";
@@ -91,12 +92,16 @@ export default function Map({
         setcheckAPI(err);
       });
   }, [lon1, lon2, lat1, lat2, time1, time2, rv, parameter]);
-
+  function flipCoordinates(coordinateArray) {
+    return coordinateArray.map(coord => [coord[1], coord[0]]);
+  }
   //依api搜尋結果，讓Map fit全部GeoJson的Bounds
   useEffect(() => {
     if (isMapReady && jsonContent && jsonContent !== "No result") {
       let bounds = new L.LatLngBounds();
       jsonContent.features.forEach((feature) => {
+        //let flippedCoordinates = flipCoordinates(feature.geometry.coordinates);
+        //let featureBounds = L.geoJSON({ ...feature, geometry: { ...feature.geometry, coordinates: flippedCoordinates } }).getBounds();
         let featureBounds = L.geoJSON(feature).getBounds();
         bounds.extend(featureBounds);
       });
@@ -170,7 +175,7 @@ export default function Map({
             {jsonContent.features.map((feature, index) => {
               const isHovered = activeHover === feature.properties.id;
               const isClicked = activeClick === feature.properties.id;
-
+              console.log(feature)
               return (
                 <React.Fragment key={feature.properties.id}>
                   <Pane style={{ zIndex: isClicked ? 1000 : 500 }}>
@@ -186,7 +191,32 @@ export default function Map({
                       }}
                       onEachFeature={onEachFeature}
                     />
-                  </Pane>
+                    </Pane>
+                    
+                  {/*<Polyline
+                    positions={feature.geometry.coordinates}
+                    pathOptions={{
+                      color: isClicked
+                        ? "#F2F5F5"
+                        : isHovered
+                        ? "#EB862F"
+                        : "#6FBCD8",
+                        weight: 1.5
+                    }}
+                    
+                    eventHandlers={{
+                      mouseover: () => setActiveHover(feature.properties.id),
+                      mouseout: () => setActiveHover(null),
+                      click: () => {
+                        setActiveClick(feature.properties.id);
+                        let flippedCoordinates = flipCoordinates(feature.geometry.coordinates);
+                        let bounds = L.geoJSON({ ...feature, geometry: { ...feature.geometry, coordinates: flippedCoordinates } }).getBounds();
+                        mapRef.current.fitBounds(bounds);
+                        }
+                    }}
+                    
+                  />*/}
+                  
 
                   {feature.properties.bottle_sta[0].features.map(
                     (object, index) => {
