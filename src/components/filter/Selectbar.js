@@ -1,8 +1,7 @@
 import { useState } from "react";
 import {Box, Typography } from "@mui/material";
-import Slider, { SliderThumb } from '@mui/material/Slider';
-import { styled } from '@mui/material/styles';
-import PropTypes from 'prop-types';
+import Slider from '@mui/material/Slider';
+
 
 const minDistance = 1;
 export default function Selectbar({
