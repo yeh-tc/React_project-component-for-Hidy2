@@ -19,6 +19,7 @@ export default function SelectDate({setFunction}) {
       setFunction([from, to])
     }
   }
+
   return (
     <Box sx={{ px: 2, py: 1 }}>
       <Typography variant="subtitle2" gutterBottom>
