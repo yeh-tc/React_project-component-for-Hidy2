@@ -14,67 +14,49 @@ body {
   height:100vh
 }
 
-.sidebarbutton .nav-item .active {
-  background-color: rgb(102, 129, 155);
-}
-
-.title{
-  font-family: "Public Sans",sans-serif;
-}
-
-.MuiNativeSelect-select{
-  background-color: rgb(102, 129, 155);
-}
-
-/*地圖上zoon in/out按鈕的顏色*/
-.leaflet-control-zoom-in,
-.leaflet-control-zoom-out {
-  background-color: #f2f5f5 !important;
-}
-.leaflet-control-zoom-in:hover,
-.leaflet-control-zoom-out:hover {
-  background-color: #DDDBE6 !important;
-}
-
-/*地圖右下角顯示經緯度的小窗格*/
-.coordinate-container {
-  z-index: 500;
-  position: absolute;
-  bottom: 17px;
-  right: 0px;
-  padding: 10px 12px;
-  background-color: rgba(255,255,255,0.8);
-  border-radius: 0px;
-  font-size: 0.75rem;
-  line-height: 1.5;
-  font-family: 'Roboto Mono';
-}
-/*地圖右下角顯示tile layer的出處*/
-.leaflet-control-attribution.leaflet-control{
-  padding: 0px 27.5px;
-}
-/*地圖左上角打開filter的按鈕*/
-.filtericon_draweropen{
-  position: absolute;
-  top: 12px;
-  left: 10px;
-  z-index: 500;
-}
-
-/*沒找到資料的snackbar 900以上的大小*/
-/*沒有drawer 要對齊地圖中間*/
-@media (min-width:900px){
-.MuiSnackbar-root{
-    left: calc(50% + 170px)!important;
-}
-}
 
 
 
 
-.marker-tooltip {
-  font-family: "Public Sans",sans-serif;
-  font-size: 16px;
-  font-weight: 500;
-} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
