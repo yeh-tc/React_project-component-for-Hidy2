@@ -2,7 +2,7 @@ import { useState} from 'react';
 import { Box, Divider } from "@mui/material";
 import Scrollbar from "./scrollbar/Scrollbar";
 import SelectCruise from './SelectCruise';
-import SelectTime from './SelectTime';
+import SelectDate from './SelectDate';
 import Selectbar from './Selectbar';
 import SelectParameter from './SelectParameter';
 
@@ -13,7 +13,6 @@ export default function ChemistryData() {
     const [lat, setLat]=useState([3,33]);
     const [date, setDate] = useState(['19950520', '20121029'])
     const [parameters, setParameters] = useState(['none'])
-    console.log(parameters)
   return (
     <div>
       <Box
@@ -37,7 +36,7 @@ export default function ChemistryData() {
           }}
         >
           <SelectCruise setRv={setRv} />
-          <SelectTime value={date} setFunction={setDate}/>
+          <SelectDate setFunction={setDate}/>
           <Selectbar
             setFunction={setLat}
             value={lat}
