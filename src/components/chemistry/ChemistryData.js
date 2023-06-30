@@ -12,7 +12,8 @@ export default function ChemistryData() {
     const [lon, setLon]=useState([106,128]);
     const [lat, setLat]=useState([3,33]);
     const [date, setDate] = useState(['19950520', '20121029'])
-    const [parameters, setParameters] = useState('none')
+    const [parameters, setParameters] = useState(['none'])
+    console.log(parameters)
   return (
     <div>
       <Box
