@@ -3,15 +3,11 @@ export default function SelectParameter({value,setFunction}){
 
     const handleParameters = (event) => {
         if (event.target.checked) {
-            //console.log([...value])
+            setFunction([...value, event.target.name]);
+          } else {
+            setFunction(value.filter(item => item !== event.target.name));
 
-            setFunction([...value, event.target.name])
-            console.log(`按新${value}`)
-        } else {
-            console.log(event.target.name)
-            setFunction(value.filter(ele => ele !== event.target.name))
-            console.log(`新${value}`)
-        }
+          }
       }
     const varList = {
         'Sal': {
@@ -104,7 +100,6 @@ export default function SelectParameter({value,setFunction}){
                   key={id}
                   control={
                     <Checkbox size='small' onChange={handleParameters} name={item.code} />
-                   
                   }
                   label={<Typography variant='caption' sx={{ width: 135 }}>{item.name} {item.unit}</Typography>}
                 />
