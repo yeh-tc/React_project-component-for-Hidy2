@@ -14,7 +14,16 @@ body {
   height:100vh
 }
 
-
+.chemDatePickr {
+  width: 100%;
+  height: 30px;
+  font-family:  "Rubik","sans-serif";
+  font-size: 0.75rem;
+  text-align: center;
+}
+.flatpickr-calendar{
+  font-family:  "Rubik","sans-serif";
+}
 
 
 

@@ -1,11 +1,11 @@
 import "leaflet/dist/leaflet.css";
 import {  useRef } from "react";
 import { Container } from "@mui/material";
-import { MapContainer, TileLayer } from "react-leaflet";
+import { MapContainer, TileLayer,Pane } from "react-leaflet";
 import ChemistryData from "../components/chemistry/ChemistryData";
 
 export default function Map() {
-    const mapRef = useRef();
+  const mapRef = useRef();
   return (
     <Container disableGutters maxWidth="100%" sx={{ mx: 0 }}>
       <MapContainer
@@ -23,7 +23,8 @@ export default function Map() {
           url="https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
           attribution="Tiles &copy; Esri"
         />
-        <ChemistryData/>
+
+        <ChemistryData />
       </MapContainer>
     </Container>
   );
