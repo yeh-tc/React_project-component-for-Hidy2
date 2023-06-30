@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 
-export default function SelectCruise({setRv}) {
+export default function SelectCruise({value,setRv}) {
   const handleChange = (event) => {
     setRv(event.target.value);
   };
@@ -13,7 +13,7 @@ export default function SelectCruise({setRv}) {
           sx={{ width: "100%" }}
           select
           label="R/V"
-          defaultValue="*"
+          defaultValue={value}
           size="small"
           onChange={handleChange}
         >
