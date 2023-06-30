@@ -32,14 +32,6 @@ export default function App() {
     <ThemeProvider theme={theme}>
     <Container maxWidth="false" disableGutters={true}>
       <Map />
-      {/*<BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Page />} />
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/cruise/:crusiename" element={<CruisePage />}/>
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-      </BrowserRouter>*/}
     </Container>
     </ThemeProvider>
   );

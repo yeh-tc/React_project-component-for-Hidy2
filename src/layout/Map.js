@@ -3,6 +3,7 @@ import {  useRef } from "react";
 import { Container } from "@mui/material";
 import { MapContainer, TileLayer } from "react-leaflet";
 import ChemistryData from "../components/chemistry/ChemistryData";
+
 export default function Map() {
     const mapRef = useRef();
   return (
