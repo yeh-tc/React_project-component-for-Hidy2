@@ -35,18 +35,18 @@ export default function ChemistryData() {
             },
           }}
         >
-          <SelectCruise setRv={setRv} />
+          <SelectCruise value={Rv} setRv={setRv} />
           <SelectDate setFunction={setDate}/>
           <Selectbar
-            setFunction={setLat}
             value={lat}
+            setFunction={setLat}
             minvalue={3}
             maxvalue={33}
             text={"Latitude Range 3 - 33°N"}
           />
           <Selectbar
-            setFunction={setLon}
             value={lon}
+            setFunction={setLon}
             minvalue={106}
             maxvalue={128}
             text={"Longitude Range 106 - 128°E"}
