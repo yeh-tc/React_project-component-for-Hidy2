@@ -1,8 +1,6 @@
-import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
 import { ThemeProvider, createTheme, responsiveFontSizes } from '@mui/material/styles';
-import FeedPage from "./pages/FeedPage";
-import HomePage from "./pages/HomePage";
 import Container from "@mui/material/Container";
+import Map from "./layout/Map";
 
 let theme = createTheme({
   palette: {
@@ -20,8 +18,10 @@ let theme = createTheme({
   
   },
   typography: {
-    fontFamily:
-      '"Public Sans"'
+    fontFamily: [
+      "Rubik",
+      "sans-serif"
+    ].join(",")
   },
 });
 theme = responsiveFontSizes(theme);
@@ -31,16 +31,15 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
     <Container maxWidth="false" disableGutters={true}>
-      <BrowserRouter>
+      <Map />
+      {/*<BrowserRouter>
       <Routes>
-        <Route path="/" element={<FeedPage />} />
+        <Route path="/" element={<Page />} />
         <Route path="/home" element={<HomePage />} />
-        {/*<Route path="/cruise/:crusiename" element={<CruisePage />}/>*/}
+        <Route path="/cruise/:crusiename" element={<CruisePage />}/>
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-      
-        
-      </BrowserRouter>
+      </BrowserRouter>*/}
     </Container>
     </ThemeProvider>
   );
