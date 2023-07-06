@@ -7,7 +7,7 @@ data
 .pnp.js
 venv
 api.js
-.env
+
 # testing
 /coverage
 
@@ -24,3 +24,4 @@ __pycache__
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.env
