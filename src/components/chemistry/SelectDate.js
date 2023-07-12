@@ -4,7 +4,7 @@ import Flatpickr from "react-flatpickr";
 
 const handleIsoString = (dateObj) => {
   dateObj.setTime(dateObj.getTime() + 8 * 3600000)
-  return dateObj.toISOString().split('T')[0].replaceAll('-', '')
+  return dateObj.toISOString().split('T')[0]
 }
 
 export default function SelectDate({setFunction}) {
