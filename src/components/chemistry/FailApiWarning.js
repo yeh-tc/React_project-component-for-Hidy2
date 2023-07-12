@@ -24,7 +24,7 @@ export default function FailApiWarning() {
         sx={{ zIndex: 999 }}
       >
         <Alert onClose={handleClose} severity="error">
-          Opps! There are some problems from chemistry data server!
+          Sorry! There are some problems from chemistry data server!
         </Alert>
       </Snackbar>
     </div>
