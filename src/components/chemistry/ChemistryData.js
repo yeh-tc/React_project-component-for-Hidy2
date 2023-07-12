@@ -1,19 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Box, Divider } from "@mui/material";
 import { GeoJSON } from "react-leaflet";
 import { api } from "./api";
+import { useMap } from "react-leaflet";
 import L from "leaflet";
-import Scrollbar from "./scrollbar/Scrollbar";
 import SelectCruise from "./SelectCruise";
 import SelectDate from "./SelectDate";
 import Selectbar from "./Selectbar";
+import Scrollbar from "./scrollbar/Scrollbar";
 import SelectParameter from "./SelectParameter";
+import RenderDataList from "./RenderDataList";
 import FailApiWarning from "./FailApiWarning";
 import NoDataWarning from "./NoDataWarning";
+import RemindParaWarning from "./RemindParaWarning";
 import Waiting from "./Waiting";
 
-
-export default function ChemistryData({mapRef}) {
+export default function ChemistryData({ mapRef }) {
+  const [loading, setLoading] = useState(true);
   const [Rv, setRv] = useState("*");
   const [lon, setLon] = useState([106, 128]);
   const [lat, setLat] = useState([3, 33]);
@@ -22,39 +25,67 @@ export default function ChemistryData({mapRef}) {
   const [data, setData] = useState();
   const [activeHover, setActiveHover] = useState(null);
   const [activeClick, setActiveClick] = useState(null);
+  const [datalist, setDatalist] = useState(null);
+  const ref = useRef();
+  const map = useMap();
 
   //query 改變時啟動
   useEffect(() => {
-    (async () => {
-      const url = `${api}/bottlediver?lat_from=${lat[0]}&lat_to=${lat[1]}&lon_from=${lon[0]}&lon_to=${lon[1]}&date_from=${date[0]}&date_to=${date[1]}&RV=${Rv}&var=${parameters.join(",")}`;
-      setData();
-      setActiveHover(null);
-      setActiveClick(null);
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        setData(data);
-      } catch (error) {
-        setData("connection error");
-      }
-    })();
+    if (parameters.toString() !== ["none"].toString()) {
+      (async () => {
+        setLoading(true);
+        setData();
+        setActiveHover(null);
+        setActiveClick(null);
+        setDatalist(null);
+
+        const url = `${api}/bottlediver?lat_from=${lat[0]}&lat_to=${lat[1]}&lon_from=${lon[0]}&lon_to=${lon[1]}&date_from=${date[0]}&date_to=${date[1]}&RV=${Rv}&var=${parameters.join(",")}`;
+        
+        try {
+          const response = await fetch(url);
+          const data = await response.json();
+          setData(data);
+          if (data.status !== "No result" && data !== undefined) {
+            const list = data.status.map((feature) => ({
+              id: feature.properties.id,
+              departure: feature.properties.depart,
+              return: feature.properties.return,
+              max_depth: feature.properties.max_dep,
+              para: feature.properties.para,
+              pi: feature.properties.pi,
+            }));
+            setDatalist(list);
+          }
+        } catch (error) {
+          setData("connection error");
+        } finally {
+          setLoading(false);
+        }
+      })();
+    }
   }, [Rv, lon, lat, date, parameters]);
 
   //讓Data的結果置中於地圖
-  useEffect(()=>{
-    if (data && data.status !== "No result" && data !== undefined && data !== "connection error"){
+  useEffect(() => {
+    if (
+      data &&
+      data.status !== "No result" &&
+      data !== undefined &&
+      data !== "connection error"
+    ) {
       let bounds = new L.LatLngBounds();
       data.status.forEach((feature) => {
         let featureBounds = L.geoJSON(feature).getBounds();
         bounds.extend(featureBounds);
       });
       if (mapRef.current) {
-      mapRef.current.fitBounds(bounds);
+        mapRef.current.fitBounds(bounds);
       }
     }
-  },[data]);
+  }, [data]);
 
-  const onEachFeature = (feature,layer) =>{
+  //GeoJson event handler
+  const onEachFeature = (feature, layer) => {
     layer.on({
       mouseover: () => {
         setActiveHover(feature.properties.id);
@@ -68,26 +99,41 @@ export default function ChemistryData({mapRef}) {
         mapRef.current.fitBounds(layer._bounds);
       },
     });
-  }
+  };
 
-  const styleFunc = (feature) =>{
+  //GeoJson style
+  const styleFunc = (feature) => {
     const isHovered = activeHover === feature.properties.id;
     const isClicked = activeClick === feature.properties.id;
     return {
-    color: isClicked ? "#F2F5F5" : isHovered ? "#EB862F" : "#6FBCD8",
-    weight: 2,
+      color: isClicked ? "#F2F5F5" : isHovered ? "#EB862F" : "#6FBCD8",
+      weight: 2,
     };
-  }
+  };
+  //讓Datapanel scrollbar滑鼠滾動時與地圖不影響 
+  useEffect(() => {
+    L.DomEvent.disableScrollPropagation(ref.current);
+  });
 
+  //讓Datapanel 移動slider時與地圖不影響
+  const enterPanel = () => {
+    map.dragging.disable();
+  };
+  const leavePanel = () => {
+    map.dragging.enable();
+  };
+
+  console.log(`click ${activeClick}`);
+  console.log(`hover ${activeHover}`);
   return (
-    <div>
+    <div ref={ref} onMouseEnter={enterPanel} onMouseLeave={leavePanel}>
       <Box
         position="absolute"
-        top="10%"
+        top="5%"
         sx={{
           zIndex: 1000,
-          height: "100%",
           width: "360px",
+          height: "90%",
           backgroundColor: "background.paper",
         }}
       >
@@ -119,18 +165,30 @@ export default function ChemistryData({mapRef}) {
           />
           <SelectParameter value={parameters} setFunction={setParameters} />
           <Divider />
+          <RenderDataList
+            datalist={datalist}
+            activeHover={activeHover}
+            activeClick={activeClick}
+            setActiveHover={setActiveHover}
+            setActiveClick={setActiveClick}
+          />
         </Scrollbar>
       </Box>
-      {data === "connection error" ? (
-        <FailApiWarning />
-      ) : data === undefined ? (
+      {parameters.toString() === ["none"].toString() ? (
+        <RemindParaWarning />
+      ) : loading ? (
         <Waiting />
+      ) : data === "connection error" ? (
+        <FailApiWarning />
       ) : data.status === "No result" ? (
         <NoDataWarning />
       ) : (
         <>
-       <GeoJSON data={data.status} style={styleFunc} onEachFeature={onEachFeature}/>
-          
+          <GeoJSON
+            data={data.status}
+            style={styleFunc}
+            onEachFeature={onEachFeature}
+          />
         </>
       )}
     </div>
