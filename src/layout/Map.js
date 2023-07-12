@@ -24,7 +24,7 @@ export default function Map() {
           attribution="Tiles &copy; Esri"
         />
 
-        <ChemistryData />
+        <ChemistryData mapRef={mapRef}/>
       </MapContainer>
     </Container>
   );
