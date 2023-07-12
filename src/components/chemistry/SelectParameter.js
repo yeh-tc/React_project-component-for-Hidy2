@@ -70,13 +70,8 @@ export default function SelectParameter({value,setFunction}){
           code: 'DIC',
           unit: '(\u00B5mol/kg)'
         },
-        'pH_NBS': {
-          name: 'pH',
-          code: 'pH(NBS)',
-          unit: ''
-        },
         'pH_total': {
-          name: 'pH',
+          name: 'pH(total)',
           code: 'pH(total)',
           unit: ''
         },
