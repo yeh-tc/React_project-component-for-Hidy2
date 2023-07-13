@@ -25,7 +25,6 @@ export default function ChemistryData({ mapRef }) {
   const [data, setData] = useState();
   const [activeHover, setActiveHover] = useState(null);
   const [activeClick, setActiveClick] = useState(null);
-  const [datalist, setDatalist] = useState(null);
   const ref = useRef();
   const map = useMap();
 
@@ -33,11 +32,12 @@ export default function ChemistryData({ mapRef }) {
   useEffect(() => {
     if (parameters.toString() !== ["none"].toString()) {
       (async () => {
+
         setLoading(true);
         setData();
         setActiveHover(null);
         setActiveClick(null);
-        setDatalist(null);
+        
 
         const url = `${api}/bottlediver?lat_from=${lat[0]}&lat_to=${lat[1]}&lon_from=${lon[0]}&lon_to=${lon[1]}&date_from=${date[0]}&date_to=${date[1]}&RV=${Rv}&var=${parameters.join(",")}`;
         
@@ -45,17 +45,6 @@ export default function ChemistryData({ mapRef }) {
           const response = await fetch(url);
           const data = await response.json();
           setData(data);
-          if (data.status !== "No result" && data !== undefined) {
-            const list = data.status.map((feature) => ({
-              id: feature.properties.id,
-              departure: feature.properties.depart,
-              return: feature.properties.return,
-              max_depth: feature.properties.max_dep,
-              para: feature.properties.para,
-              pi: feature.properties.pi,
-            }));
-            setDatalist(list);
-          }
         } catch (error) {
           setData("connection error");
         } finally {
@@ -123,8 +112,7 @@ export default function ChemistryData({ mapRef }) {
     map.dragging.enable();
   };
 
-  console.log(`click ${activeClick}`);
-  console.log(`hover ${activeHover}`);
+  
   return (
     <div ref={ref} onMouseEnter={enterPanel} onMouseLeave={leavePanel}>
       <Box
@@ -166,7 +154,7 @@ export default function ChemistryData({ mapRef }) {
           <SelectParameter value={parameters} setFunction={setParameters} />
           <Divider />
           <RenderDataList
-            datalist={datalist}
+            data={data}
             activeHover={activeHover}
             activeClick={activeClick}
             setActiveHover={setActiveHover}
