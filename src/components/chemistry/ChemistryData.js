@@ -54,7 +54,7 @@ export default function ChemistryData({ mapRef }) {
     }
   }, [Rv, lon, lat, date, parameters]);
 
-  //讓Data的結果置中於地圖
+  //讓query後的結果置中於地圖
   useEffect(() => {
     if (
       data &&
@@ -71,7 +71,7 @@ export default function ChemistryData({ mapRef }) {
         mapRef.current.fitBounds(bounds);
       }
     }
-  }, [data]);
+  }, [data,mapRef]);
 
   //GeoJson event handler
   const onEachFeature = (feature, layer) => {
@@ -90,6 +90,9 @@ export default function ChemistryData({ mapRef }) {
     });
   };
 
+
+
+  
   //GeoJson style
   const styleFunc = (feature) => {
     const isHovered = activeHover === feature.properties.id;
@@ -155,6 +158,7 @@ export default function ChemistryData({ mapRef }) {
           <Divider />
           <RenderDataList
             data={data}
+            mapRef={mapRef}
             activeHover={activeHover}
             activeClick={activeClick}
             setActiveHover={setActiveHover}
