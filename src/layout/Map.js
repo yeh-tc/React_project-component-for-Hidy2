@@ -1,7 +1,7 @@
 import "leaflet/dist/leaflet.css";
 import {  useRef } from "react";
 import { Container } from "@mui/material";
-import { MapContainer, TileLayer,Pane } from "react-leaflet";
+import { MapContainer, TileLayer } from "react-leaflet";
 import ChemistryData from "../components/chemistry/ChemistryData";
 
 export default function Map() {
