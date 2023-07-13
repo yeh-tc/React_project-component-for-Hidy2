@@ -1,13 +1,15 @@
 import React, { useState, useEffect} from "react";
 import { List } from "@mui/material";
 import CruiseInfo from "./CruiseInfo";
+import L from "leaflet";
 
 export default function RenderDataList({
   data,
-  setActiveClick,
-  activeClick,
+  mapRef,
   activeHover,
+  activeClick,
   setActiveHover,
+  setActiveClick
 }) {
   const [renderlist, setRenderlist] = useState(null);
   const [opentext, setOpentext] = useState(false);
@@ -19,6 +21,9 @@ export default function RenderDataList({
     }));
     if (wasopen !== true) {
       setActiveClick(id);
+      const feature = data.status.find((data) => data.properties.id === id);
+      const bounds = L.geoJSON(feature).getBounds();
+      mapRef.current.fitBounds(bounds);
     } else if (wasopen === true) {
       setActiveClick(null);
     }
@@ -29,8 +34,8 @@ export default function RenderDataList({
     if (data !== undefined && data.status !== "No result") {
       const list = data.status.map((feature) => ({
         id: feature.properties.id,
-        departure: feature.properties.depart,
-        return: feature.properties.return,
+        departure: feature.properties.depart.toString().split('T')[0],
+        return: feature.properties.return.toString().split('T')[0],
         max_depth: feature.properties.max_dep,
         para: feature.properties.para,
         pi: feature.properties.pi,
