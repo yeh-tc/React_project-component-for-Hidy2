@@ -21,17 +21,17 @@ export default function SelectParameter({value,setFunction}){
           unit: '(\u00B5M)'
         },
         'NO3': {
-          name: 'Nitrate',
+          name: 'Nitrate (NO\u2083\u207B)',
           code: 'NO3',
           unit: '(\u00B5M)'
         },
         'NO2': {
-          name: 'Nitrite',
+          name: 'Nitrite (NO\u2082\u207B)',
           code: 'NO2',
           unit: '(\u00B5M)'
         },
         'PO4': {
-          name: 'Phosphate',
+          name: 'Phosphate (PO\u2084\u00B3\u207B)',
           code: 'PO4',
           unit: '(\u00B5M)'
         },
@@ -41,7 +41,7 @@ export default function SelectParameter({value,setFunction}){
           unit: '(\u00B5M)'
         },
         'NH4': {
-          name: 'Ammonium',
+          name: 'Ammonium (NH\u2084\u207A)',
           code: 'NH4',
           unit: '(\u00B5M)'
         },
@@ -51,27 +51,27 @@ export default function SelectParameter({value,setFunction}){
           unit: '(\u00B5g/l)'
         },
         'POC': {
-          name: 'Particulate Organic Carbon',
+          name: 'Particulate Organic Carbon (POC)',
           code: 'POC',
           unit: '(\u00B5g/l)'
         },
         'PON': {
-          name: 'Particulate Organic Nitrogen',
+          name: 'Particulate Organic Nitrogen (PON)',
           code: 'PON',
           unit: '(\u00B5g/l)'
         },
         'DOC': {
-          name: 'Dissolved Organic Carbon',
+          name: 'Dissolved Organic Carbon (DOC)',
           code: 'DOC',
           unit: '(\u00B5g/l)'
         },
         'DIC': {
-          name: 'Dissolved Inorganic Carbon',
+          name: 'Dissolved Inorganic Carbon (DIC)',
           code: 'DIC',
           unit: '(\u00B5mol/kg)'
         },
         'pH_total': {
-          name: 'pH(total)',
+          name: 'pH (total)',
           code: 'pH(total)',
           unit: ''
         },

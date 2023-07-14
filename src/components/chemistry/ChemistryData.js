@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Box, Divider } from "@mui/material";
 import { GeoJSON } from "react-leaflet";
 import { api } from "./api";
@@ -13,6 +13,7 @@ import RenderDataList from "./RenderDataList";
 import FailApiWarning from "./FailApiWarning";
 import NoDataWarning from "./NoDataWarning";
 import RemindParaWarning from "./RemindParaWarning";
+import MapMarker from "./MapMarker";
 import Waiting from "./Waiting";
 
 export default function ChemistryData({ mapRef }) {
@@ -23,36 +24,39 @@ export default function ChemistryData({ mapRef }) {
   const [date, setDate] = useState(["1995-05-20", "2012-10-29"]);
   const [parameters, setParameters] = useState(["none"]);
   const [data, setData] = useState();
+  const [noData, setNoData] = useState(false);
   const [activeHover, setActiveHover] = useState(null);
   const [activeClick, setActiveClick] = useState(null);
   const ref = useRef();
   const map = useMap();
+  //fetch data function
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setData();
+    setNoData(false);
+    setActiveHover(null);
+    setActiveClick(null);
+    const url = `${api}/bottlediver?lat_from=${lat[0]}&lat_to=${lat[1]}&lon_from=${lon[0]}&lon_to=${lon[1]}&date_from=${date[0]}&date_to=${date[1]}&RV=${Rv}&var=${parameters.join(",")}`;
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      setData(data);
+      if (data === null || data.status === "No result") {
+        setNoData(true);
+      }
+    } catch (error) {
+      setData("connection error");
+    } finally {
+      setLoading(false);
+    }
 
+  },[Rv, lon, lat, date, parameters])
   //query 改變時啟動
   useEffect(() => {
     if (parameters.toString() !== ["none"].toString()) {
-      (async () => {
-
-        setLoading(true);
-        setData();
-        setActiveHover(null);
-        setActiveClick(null);
-        
-
-        const url = `${api}/bottlediver?lat_from=${lat[0]}&lat_to=${lat[1]}&lon_from=${lon[0]}&lon_to=${lon[1]}&date_from=${date[0]}&date_to=${date[1]}&RV=${Rv}&var=${parameters.join(",")}`;
-        
-        try {
-          const response = await fetch(url);
-          const data = await response.json();
-          setData(data);
-        } catch (error) {
-          setData("connection error");
-        } finally {
-          setLoading(false);
-        }
-      })();
+      fetchData();
     }
-  }, [Rv, lon, lat, date, parameters]);
+  }, [fetchData,parameters]);
 
   //讓query後的結果置中於地圖
   useEffect(() => {
@@ -71,7 +75,7 @@ export default function ChemistryData({ mapRef }) {
         mapRef.current.fitBounds(bounds);
       }
     }
-  }, [data,mapRef]);
+  }, [data, mapRef]);
 
   //GeoJson event handler
   const onEachFeature = (feature, layer) => {
@@ -90,19 +94,16 @@ export default function ChemistryData({ mapRef }) {
     });
   };
 
-
-
-  
   //GeoJson style
-  const styleFunc = (feature) => {
+  const styleFunc = useCallback((feature) => {
     const isHovered = activeHover === feature.properties.id;
     const isClicked = activeClick === feature.properties.id;
     return {
       color: isClicked ? "#F2F5F5" : isHovered ? "#EB862F" : "#6FBCD8",
       weight: 2,
     };
-  };
-  //讓Datapanel scrollbar滑鼠滾動時與地圖不影響 
+  },[activeHover, activeClick]);
+  //讓Datapanel scrollbar滑鼠滾動時與地圖不影響
   useEffect(() => {
     L.DomEvent.disableScrollPropagation(ref.current);
   });
@@ -114,8 +115,8 @@ export default function ChemistryData({ mapRef }) {
   const leavePanel = () => {
     map.dragging.enable();
   };
-
-  
+  const isError = data === "connection error";
+  console.log(data)
   return (
     <div ref={ref} onMouseEnter={enterPanel} onMouseLeave={leavePanel}>
       <Box
@@ -170,9 +171,9 @@ export default function ChemistryData({ mapRef }) {
         <RemindParaWarning />
       ) : loading ? (
         <Waiting />
-      ) : data === "connection error" ? (
+      ) : isError ? (
         <FailApiWarning />
-      ) : data.status === "No result" ? (
+      ) : noData ? (
         <NoDataWarning />
       ) : (
         <>
@@ -181,6 +182,25 @@ export default function ChemistryData({ mapRef }) {
             style={styleFunc}
             onEachFeature={onEachFeature}
           />
+          {data && !isError && data.status !== "No result" &&
+            data.status.flatMap((object) => {
+              const isHovered = activeHover === object.properties.id;
+              const isClicked = activeClick === object.properties.id;
+              return object.properties.bottle_sta[0].features.map((sta,index)=>{
+                return (
+                  <MapMarker
+                  key={`${sta.properties.station}-${object.properties.id}`}
+                  object={sta}
+                  isHovered={isHovered}
+                  isClicked={isClicked}
+                  id={object.properties.id}
+                  setActiveHover={setActiveHover}
+                />
+                );
+              })
+              
+            })
+            }
         </>
       )}
     </div>

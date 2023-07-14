@@ -10,10 +10,7 @@ const handleIsoString = (dateObj) => {
 export default function SelectDate({setFunction}) {
   
   const handleChange = (newDate) =>{
-    if (newDate.length === 1) {
-      const dt = handleIsoString(newDate[0])
-      setFunction([dt,dt])
-    } else {
+    if (newDate.length !== 1) {
       const from = handleIsoString(newDate[0])
       const to = handleIsoString(newDate[1])
       setFunction([from, to])
