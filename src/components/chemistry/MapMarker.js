@@ -53,7 +53,8 @@ export default function MapMarker({
         zIndexOffset={isClicked ? 9999 : isHovered ? 9999 : 500}
       >
         <Tooltip direction="top" offset={[0, 0]}>
-          {object.properties.date} &nbsp; {object.properties.station}
+          {object.properties.date} &nbsp; Sta:{object.properties.station}<br/>
+          Click for data display.
         </Tooltip>
       </Marker>
       <Modal
