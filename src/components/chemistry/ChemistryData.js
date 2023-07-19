@@ -1,63 +1,38 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Box, Divider } from "@mui/material";
 import { GeoJSON } from "react-leaflet";
-import { api } from "./api";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
-import SelectCruise from "./SelectCruise";
-import SelectDate from "./SelectDate";
-import Selectbar from "./Selectbar";
+
 import Scrollbar from "./scrollbar/Scrollbar";
-import SelectParameter from "./SelectParameter";
+import SelectControls from './SelectControls';
 import RenderDataList from "./RenderDataList";
 import FailApiWarning from "./FailApiWarning";
 import NoDataWarning from "./NoDataWarning";
 import RemindParaWarning from "./RemindParaWarning";
 import MapMarker from "./MapMarker";
 import Waiting from "./Waiting";
+import useDataFetch from './useDataFetch';
+
 
 export default function ChemistryData({ mapRef }) {
-  const [loading, setLoading] = useState(true);
   const [Rv, setRv] = useState("*");
   const [lon, setLon] = useState([106, 128]);
   const [lat, setLat] = useState([3, 33]);
   const [date, setDate] = useState(["1995-05-20", "2012-10-29"]);
   const [parameters, setParameters] = useState(["none"]);
-  const [data, setData] = useState();
-  const [noData, setNoData] = useState(false);
   const [activeHover, setActiveHover] = useState(null);
   const [activeClick, setActiveClick] = useState(null);
   const ref = useRef();
   const map = useMap();
+
   //fetch data function
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    setData();
-    setNoData(false);
+  const { loading, data, noData } = useDataFetch(lon, lat, date, Rv, parameters);
+  useEffect(()=>{
     setActiveHover(null);
     setActiveClick(null);
-    const url = `${api}/bottlediver?lat_from=${lat[0]}&lat_to=${lat[1]}&lon_from=${lon[0]}&lon_to=${lon[1]}&date_from=${date[0]}&date_to=${date[1]}&RV=${Rv}&var=${parameters.join(",")}`;
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      setData(data);
-      if (data === null || data.status === "No result") {
-        setNoData(true);
-      }
-    } catch (error) {
-      setData("connection error");
-    } finally {
-      setLoading(false);
-    }
-
-  },[Rv, lon, lat, date, parameters])
-  //query 改變時啟動
-  useEffect(() => {
-    if (parameters.toString() !== ["none"].toString()) {
-      fetchData();
-    }
-  }, [fetchData,parameters]);
-
+  },[loading])
+  
   //讓query後的結果置中於地圖
   useEffect(() => {
     if (
@@ -116,7 +91,8 @@ export default function ChemistryData({ mapRef }) {
     map.dragging.enable();
   };
   const isError = data === "connection error";
-  console.log(data)
+
+
   return (
     <div ref={ref} onMouseEnter={enterPanel} onMouseLeave={leavePanel}>
       <Box
@@ -139,26 +115,11 @@ export default function ChemistryData({ mapRef }) {
             },
           }}
         >
-          <SelectCruise setRv={setRv} />
-          <SelectDate setFunction={setDate} />
-          <Selectbar
-            value={lat}
-            setFunction={setLat}
-            minvalue={3}
-            maxvalue={33}
-            text={"Latitude Range 3 - 33°N"}
-          />
-          <Selectbar
-            value={lon}
-            setFunction={setLon}
-            minvalue={106}
-            maxvalue={128}
-            text={"Longitude Range 106 - 128°E"}
-          />
-          <SelectParameter value={parameters} setFunction={setParameters} />
+          <SelectControls setRv={setRv} setDate={setDate} setLat={setLat} setLon={setLon} parameters={parameters} setParameters={setParameters} />
           <Divider />
           <RenderDataList
             data={data}
+            loading={loading}
             mapRef={mapRef}
             activeHover={activeHover}
             activeClick={activeClick}
@@ -183,24 +144,27 @@ export default function ChemistryData({ mapRef }) {
             onEachFeature={onEachFeature}
           />
           {data && !isError && data.status !== "No result" &&
-            data.status.flatMap((object) => {
+            data.status.flatMap((object,outerIndex) => {
               const isHovered = activeHover === object.properties.id;
               const isClicked = activeClick === object.properties.id;
               return object.properties.bottle_sta[0].features.map((sta,index)=>{
+                const uniqueKey = `${outerIndex}-${index}`; 
                 return (
                   <MapMarker
-                  key={`${sta.properties.station}-${object.properties.id}`}
+                  key={uniqueKey}
                   object={sta}
                   isHovered={isHovered}
                   isClicked={isClicked}
-                  id={object.properties.id}
+                  index={index}
                   setActiveHover={setActiveHover}
                 />
+                 
                 );
               })
               
             })
             }
+            <></>
         </>
       )}
     </div>
