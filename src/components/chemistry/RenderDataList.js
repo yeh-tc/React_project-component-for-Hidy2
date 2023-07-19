@@ -5,6 +5,7 @@ import L from "leaflet";
 
 export default function RenderDataList({
   data,
+  loading,
   mapRef,
   activeHover,
   activeClick,
@@ -31,7 +32,9 @@ export default function RenderDataList({
 
   
   useEffect(() => {
-    if (data !== undefined && data.status !== "No result") {
+    if (loading){
+      setRenderlist(null);
+    }else if (data !== undefined && data.status !== "No result") {
       const list = data.status.map((feature) => ({
         id: feature.properties.id,
         departure: feature.properties.depart.toString().split('T')[0],
@@ -42,11 +45,11 @@ export default function RenderDataList({
       }));
       setRenderlist(list);
     }
-  }, [data]);
+  }, [data,loading]);
 
   //做一個id list
   useEffect(() => {
-    if (data !== undefined && data.status !== "No result") {
+    if (data !== undefined && data.status !== "No result" && data.status !==undefined) {
       const newIdList = data.status.map((data) => data.properties.id);
       setIdList(newIdList);
     }
