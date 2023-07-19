@@ -1,4 +1,5 @@
-import { Box, Checkbox, FormControlLabel, Typography, Grid } from '@mui/material'
+import { Box, Checkbox, FormControlLabel, Typography, Grid } from '@mui/material';
+
 export default function SelectParameter({value,setFunction}){
 
     const handleParameters = (event) => {
