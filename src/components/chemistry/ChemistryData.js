@@ -23,6 +23,7 @@ export default function ChemistryData({ mapRef }) {
   const [parameters, setParameters] = useState(["none"]);
   const [activeHover, setActiveHover] = useState(null);
   const [activeClick, setActiveClick] = useState(null);
+  
   const ref = useRef();
   const map = useMap();
 
@@ -148,14 +149,14 @@ export default function ChemistryData({ mapRef }) {
               const isHovered = activeHover === object.properties.id;
               const isClicked = activeClick === object.properties.id;
               return object.properties.bottle_sta[0].features.map((sta,index)=>{
-                const uniqueKey = `${outerIndex}-${index}`; 
+                const uniqueKey = `${outerIndex}-${index}`;  
                 return (
                   <MapMarker
                   key={uniqueKey}
                   object={sta}
+                  objects={object.properties.bottle_sta[0].features}
                   isHovered={isHovered}
                   isClicked={isClicked}
-                  index={index}
                   setActiveHover={setActiveHover}
                 />
                  
