@@ -17,25 +17,26 @@ const MarkerIcon = ({ isClicked, isHovered })=> useMemo(()=>{
   });
 },[isClicked,isHovered])
 
-const TooltipContent = ({object,index}) => useMemo(()=>(
+const TooltipContent = ({object}) => useMemo(()=>(
   <>
-  {object.properties.date} &nbsp; Station:{object.properties.station}<br/>
-  Click for data display.index:{index}
+  {object.properties.date} &nbsp; St:&nbsp;{object.properties.station}<br/>
+  Click for data display.
   </>
 ),[object])
 
 
 export default function MapMarker({
   object,
+  objects,
   isClicked,
   isHovered,
-  setActiveHover,
-  index,
+  setActiveHover
 }) {
   const [open, setOpen] = useState(false);
 
   const markerIcon = MarkerIcon({ isClicked, isHovered });
-  const tooltipContent = TooltipContent({object,index});
+  const tooltipContent = TooltipContent({object});
+  
   
   return (
     <>
@@ -56,7 +57,7 @@ export default function MapMarker({
         {tooltipContent}
         </Tooltip>
       </Marker>
-      <StationModal open={open} setOpen={setOpen} object={object}/>
+      <StationModal open={open} setOpen={setOpen} object={object} objects={objects}/>
     </>
   );
 }
