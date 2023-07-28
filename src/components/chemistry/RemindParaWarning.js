@@ -25,7 +25,7 @@ export default function RemindParaWarning() {
         sx={{ zIndex: 999 }}
       >
         <Alert onClose={handleClose} severity="warning">
-        Please choose the parameters on the left panel.
+        At least choose one parameter on the left panel for data rendering.
         </Alert>
       </Snackbar>
     </div>
