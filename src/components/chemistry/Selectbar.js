@@ -20,7 +20,7 @@ export default function Selectbar({setFunction,value,minvalue,maxvalue,text,
           min={minvalue}
           track="normal"
           marks
-          onChange={handleChange}
+          onChangeCommitted={handleChange}
           valueLabelDisplay="auto"
         />
       </Box>
