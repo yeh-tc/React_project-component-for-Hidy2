@@ -91,6 +91,10 @@ export default function ChemistryData({ mapRef }) {
   const leavePanel = () => {
     map.dragging.enable();
   };
+  //
+
+  
+
   const isError = data === "connection error";
 
 
@@ -129,6 +133,7 @@ export default function ChemistryData({ mapRef }) {
           />
         </Scrollbar>
       </Box>
+      
       {parameters.toString() === ["none"].toString() ? (
         <RemindParaWarning />
       ) : loading ? (
