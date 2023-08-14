@@ -1,24 +1,13 @@
 import {useState, useEffect, useCallback} from 'react';
 import { api } from "./api";
-import { kml } from '@mapbox/togeojson';
-import { DOMParser } from 'xmldom';
-
 export default function useDataFetch (lon, lat, date, Rv, parameters){
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState();
-    const [info, setInfo] = useState();
-    const [marker, setMarker] = useState();
     const [noData, setNoData] = useState(false);
-    const convertKMLToGeoJSON = (kmlString) => {
-      const parser = new DOMParser();
-      const kmlDOM = parser.parseFromString(kmlString, 'text/xml');
-      return kml(kmlDOM);
-    }
 
     const fetchData = useCallback(async () => {
         setLoading(true);
         setData();
-        setInfo();
         setNoData(false);
         
         const url = `${api}/bottlediver?lat_from=${lat[0]}&lat_to=${lat[1]}&lon_from=${lon[0]}&lon_to=${lon[1]}&date_from=${date[0]}&date_to=${date[1]}&RV=${Rv}&var=${parameters.join(",")}`;
@@ -26,18 +15,12 @@ export default function useDataFetch (lon, lat, date, Rv, parameters){
         try {
           const response = await fetch(url);
           const data = await response.json();
-          if (data !== null && data !== "No result"){
-            const convertedData = data.kml_contents.map(convertKMLToGeoJSON);
-            setData(convertedData);
-            setInfo(data.info_contents);
-            setMarker(data.marker_contents);
-          }
-          if (data === null || data === "No result") {
+          setData(data);
+          if (data === null || data.status === "No result") {
             setNoData(true);
           }
         } catch (error) {
           setData("connection error");
-
         } finally {
           setLoading(false);
         }
@@ -46,12 +29,9 @@ export default function useDataFetch (lon, lat, date, Rv, parameters){
       useEffect(() => {
         if (parameters.toString() !== ["none"].toString()) {
           fetchData();
-        }else{
-          setData();
-          setInfo();
-          setMarker();}
+        }
       }, [fetchData, parameters]);
       
-      return {loading, data, noData, info, marker}
+      return {loading, data, noData}
 
 }

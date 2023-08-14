@@ -15,10 +15,17 @@ export default function CruiseInfo({
   handleClick,
   activeHover,
   setActiveHover,
+  layersRef
 }) {
   let validJsonString = text.para.replace(/'/g, '"');
   let paraArray = JSON.parse(validJsonString);
   const isHovered = activeHover === text.id;
+  const handleMouseEnter = (id) => {
+    if (layersRef.current[id]) {
+      layersRef.current[id].bringToFront();
+    }
+    setActiveHover(id);
+  };
 
   return (
     <>
@@ -26,7 +33,7 @@ export default function CruiseInfo({
         <>
           <ListItemButton
             onClick={() => handleClick(index)}
-            onMouseEnter={() => setActiveHover(text.id)}
+            onMouseEnter={() => handleMouseEnter(text.id)}
             onMouseLeave={() => setActiveHover(null)}
             sx={{ color: isHovered ? "#EB862F" : "#1976d2" }}
           >

@@ -74,10 +74,12 @@ const ModalContent = forwardRef(
 );
 
 export default function StationModal({ object, objects, open, setOpen }) {
+  
   const handleClose = () => {
     setOpen(false);
   };
   const [index, setIndex] = useState(objects.findIndex((o) => o === object));
+  
   const handleNext = () => {
     if (index < objects.length - 1) {
       setIndex(index + 1);
@@ -101,16 +103,17 @@ export default function StationModal({ object, objects, open, setOpen }) {
   }, [index, objects.length]);
 
   const currentObject = objects[index];
+  
   return (
     <Modal open={open} onClose={handleClose}>
       <div tabIndex={-1}>
-        <ModalContent
+       } <ModalContent
           object={currentObject}
           handlePrevious={handlePrevious}
           handleNext={handleNext}
           isLast={isLast}
           isFirst={isFirst}
-        />
+  />
       </div>
     </Modal>
   );

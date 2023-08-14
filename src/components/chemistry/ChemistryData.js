@@ -5,45 +5,54 @@ import { useMap } from "react-leaflet";
 import L from "leaflet";
 
 import Scrollbar from "./scrollbar/Scrollbar";
-import SelectControls from './SelectControls';
+import SelectControls from "./SelectControls";
 import RenderDataList from "./RenderDataList";
 import FailApiWarning from "./FailApiWarning";
 import NoDataWarning from "./NoDataWarning";
 import RemindParaWarning from "./RemindParaWarning";
 import MapMarker from "./MapMarker";
 import Waiting from "./Waiting";
-import useDataFetch from './useDataFetch';
+import useDataFetch from "./useDataFetch";
 
 
 export default function ChemistryData({ mapRef }) {
   const [Rv, setRv] = useState("*");
   const [lon, setLon] = useState([106, 128]);
   const [lat, setLat] = useState([3, 33]);
-  const [date, setDate] = useState(["1995-05-20", "2012-10-29"]);
+  const [date, setDate] = useState(["2004-08-14", "2012-10-29"]);
   const [parameters, setParameters] = useState(["none"]);
   const [activeHover, setActiveHover] = useState(null);
   const [activeClick, setActiveClick] = useState(null);
-  
+
   const ref = useRef();
   const map = useMap();
+  const layersRef = useRef({});
+
+
 
   //fetch data function
-  const { loading, data, noData } = useDataFetch(lon, lat, date, Rv, parameters);
-  useEffect(()=>{
+  const { loading, data, noData, info, marker } = useDataFetch(
+    lon,
+    lat,
+    date,
+    Rv,
+    parameters
+  );
+  useEffect(() => {
     setActiveHover(null);
     setActiveClick(null);
-  },[loading])
-  
+  }, [loading]);
+
   //讓query後的結果置中於地圖
   useEffect(() => {
     if (
       data &&
-      data.status !== "No result" &&
+      data !== "No result" &&
       data !== undefined &&
       data !== "connection error"
     ) {
       let bounds = new L.LatLngBounds();
-      data.status.forEach((feature) => {
+      data.forEach((feature) => {
         let featureBounds = L.geoJSON(feature).getBounds();
         bounds.extend(featureBounds);
       });
@@ -53,33 +62,44 @@ export default function ChemistryData({ mapRef }) {
     }
   }, [data, mapRef]);
 
-  //GeoJson event handler
+  ////GeoJson event handler
   const onEachFeature = (feature, layer) => {
+    const cruiseId = feature.properties?.name.split("_");
+    layersRef.current[`${cruiseId[0]}${cruiseId[1]}`] = layer;
+    layer.bindTooltip(`${cruiseId[0]}-${cruiseId[1]}`, { sticky: true });
     layer.on({
       mouseover: () => {
-        setActiveHover(feature.properties.id);
+        setActiveHover(`${cruiseId[0]}${cruiseId[1]}`);
+
+        layer.bringToFront();
       },
       mouseout: () => {
         setActiveHover(null);
       },
       click: () => {
-        setActiveClick(feature.properties.id);
+        setActiveClick(`${cruiseId[0]}${cruiseId[1]}`);
+        layer.bringToFront();
         //單個GeoJson物件置中於地圖
         mapRef.current.fitBounds(layer._bounds);
       },
     });
   };
-
-  //GeoJson style
-  const styleFunc = useCallback((feature) => {
-    const isHovered = activeHover === feature.properties.id;
-    const isClicked = activeClick === feature.properties.id;
-    return {
-      color: isClicked ? "#F2F5F5" : isHovered ? "#EB862F" : "#6FBCD8",
-      weight: 2,
-    };
-  },[activeHover, activeClick]);
-  //讓Datapanel scrollbar滑鼠滾動時與地圖不影響
+  //
+  ////GeoJson style
+  const styleFunc = useCallback(
+    (feature) => {
+      const cruiseId = feature.properties?.name.split("_");
+      const isHovered = activeHover === `${cruiseId[0]}${cruiseId[1]}`;
+      const isClicked = activeClick === `${cruiseId[0]}${cruiseId[1]}`;
+      return {
+        color: isClicked ? "#d62828" : isHovered ? "#EB862F" : "#6FBCD8",
+        weight: isClicked ? 3 : 2,
+      };
+    },
+    [activeHover, activeClick]
+  );
+  
+  ////讓Datapanel scrollbar滑鼠滾動時與地圖不影響
   useEffect(() => {
     L.DomEvent.disableScrollPropagation(ref.current);
   });
@@ -93,10 +113,7 @@ export default function ChemistryData({ mapRef }) {
   };
   //
 
-  
-
   const isError = data === "connection error";
-
 
   return (
     <div ref={ref} onMouseEnter={enterPanel} onMouseLeave={leavePanel}>
@@ -120,20 +137,29 @@ export default function ChemistryData({ mapRef }) {
             },
           }}
         >
-          <SelectControls setRv={setRv} setDate={setDate} setLat={setLat} setLon={setLon} parameters={parameters} setParameters={setParameters} />
+          <SelectControls
+            setRv={setRv}
+            setDate={setDate}
+            setLat={setLat}
+            setLon={setLon}
+            parameters={parameters}
+            setParameters={setParameters}
+          />
           <Divider />
+          {info !== undefined &&
           <RenderDataList
-            data={data}
-            loading={loading}
+            data={info}
             mapRef={mapRef}
+            loading={loading}
+            layersRef={layersRef}
             activeHover={activeHover}
             activeClick={activeClick}
             setActiveHover={setActiveHover}
             setActiveClick={setActiveClick}
-          />
+          />}
         </Scrollbar>
       </Box>
-      
+
       {parameters.toString() === ["none"].toString() ? (
         <RemindParaWarning />
       ) : loading ? (
@@ -145,32 +171,28 @@ export default function ChemistryData({ mapRef }) {
       ) : (
         <>
           <GeoJSON
-            data={data.status}
+            data={data}
             style={styleFunc}
             onEachFeature={onEachFeature}
           />
-          {data && !isError && data.status !== "No result" &&
-            data.status.flatMap((object,outerIndex) => {
-              const isHovered = activeHover === object.properties.id;
-              const isClicked = activeClick === object.properties.id;
-              return object.properties.bottle_sta[0].features.map((sta,index)=>{
-                const uniqueKey = `${outerIndex}-${index}`;  
-                return (
-                  <MapMarker
-                  key={uniqueKey}
-                  object={sta}
-                  objects={object.properties.bottle_sta[0].features}
+
+          {marker && !isError && marker !== undefined &&
+            marker.map((object, Index) => {
+              const cruiseId = object.features[0].properties.odb_cruise_id;
+              const isHovered = activeHover === cruiseId;
+              const isClicked = activeClick === cruiseId;
+              return object.features.map((station)=>
+              (
+                <MapMarker
+                  object={station}
+                  objects={marker[Index].features}
                   isHovered={isHovered}
                   isClicked={isClicked}
                   setActiveHover={setActiveHover}
-                />
-                 
-                );
-              })
+                  setActiveClick={setActiveClick}/>
               
-            })
-            }
-            <></>
+            ));
+            })}
         </>
       )}
     </div>

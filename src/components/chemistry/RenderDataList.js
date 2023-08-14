@@ -1,12 +1,13 @@
 import React, { useState, useEffect} from "react";
 import { List } from "@mui/material";
 import CruiseInfo from "./CruiseInfo";
-import L from "leaflet";
+
 
 export default function RenderDataList({
   data,
-  loading,
   mapRef,
+  loading,
+  layersRef,
   activeHover,
   activeClick,
   setActiveHover,
@@ -22,26 +23,26 @@ export default function RenderDataList({
     }));
     if (wasopen !== true) {
       setActiveClick(id);
-      const feature = data.status.find((data) => data.properties.id === id);
-      const bounds = L.geoJSON(feature).getBounds();
-      mapRef.current.fitBounds(bounds);
+      if (layersRef.current[id]) {
+        mapRef.current.fitBounds(layersRef.current[id]._bounds);
+      }
     } else if (wasopen === true) {
       setActiveClick(null);
     }
   };
 
-  
+  console.log(data)
   useEffect(() => {
     if (loading){
       setRenderlist(null);
-    }else if (data !== undefined && data.status !== "No result") {
-      const list = data.status.map((feature) => ({
-        id: feature.properties.id,
-        departure: feature.properties.depart.toString().split('T')[0],
-        return: feature.properties.return.toString().split('T')[0],
-        max_depth: feature.properties.max_dep,
-        para: feature.properties.para,
-        pi: feature.properties.pi,
+    }else if (data !== undefined && data !== "No result" && data !== "connection error") {
+      const list = data.map((feature) => ({
+        id: feature.id,
+        departure: feature.depart.toString().split('T')[0],
+        return: feature.return.toString().split('T')[0],
+        max_depth: feature.max_dep,
+        para: feature.para,
+        pi: feature.pi,
       }));
       setRenderlist(list);
     }
@@ -49,8 +50,8 @@ export default function RenderDataList({
 
   //做一個id list
   useEffect(() => {
-    if (data !== undefined && data.status !== "No result" && data.status !==undefined) {
-      const newIdList = data.status.map((data) => data.properties.id);
+    if (data !== undefined && data !== "No result" && data !== "connection error") {
+      const newIdList = data.map((data) => data.id);
       setIdList(newIdList);
     }
   }, [data]);
@@ -90,6 +91,7 @@ export default function RenderDataList({
                   activeHover={activeHover}
                   activeClick={activeClick}
                   setActiveHover={setActiveHover}
+                  layersRef={layersRef}
                 />
               </React.Fragment>
             );

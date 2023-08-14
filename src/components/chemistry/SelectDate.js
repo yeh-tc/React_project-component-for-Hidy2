@@ -20,15 +20,15 @@ export default function SelectDate({setFunction}) {
   return (
     <Box sx={{ px: 2, py: 1 }}>
       <Typography variant="subtitle2" gutterBottom>
-        Time Span 1995 ~ 2012
+        Time Span 2004 ~ 2012
       </Typography>
       <Flatpickr
         className="chemDatePickr"
         onChange={handleChange}
         options={{
-          minDate: "1995-05-20",
+          minDate: "2004-05-20",
           maxDate: "2012-10-29",
-          defaultDate:["1995-05-20","2012-10-29"],
+          defaultDate:["2004-08-14","2012-10-29"],
           mode: "range",
         }}
       />

@@ -30,26 +30,30 @@ export default function MapMarker({
   objects,
   isClicked,
   isHovered,
-  setActiveHover
+  setActiveHover,
+  setActiveClick
 }) {
   const [open, setOpen] = useState(false);
 
   const markerIcon = MarkerIcon({ isClicked, isHovered });
   const tooltipContent = TooltipContent({object});
-  
+  const clickfunc = () =>{
+    setOpen(true);
+    setActiveClick(object.properties.odb_cruise_id);
+  };
   
   return (
     <>
       <Marker
         position={[
-          object.geometry.coordinates[0],
           object.geometry.coordinates[1],
+          object.geometry.coordinates[0],
         ]}
         icon={markerIcon}
         eventHandlers={{
           mouseover: () => setActiveHover(object.properties.odb_cruise_id),
           mouseout: () => setActiveHover(null),
-          click: () => setOpen(true),
+          click: () => clickfunc(),
         }}
         zIndexOffset={isClicked ? 9999 : isHovered ? 9999 : 500}
       >
