@@ -9,6 +9,7 @@
     "@fontsource/roboto": "^5.0.1",
     "@fontsource/roboto-mono": "^5.0.3",
     "@fontsource/rubik": "^5.0.3",
+    "@mapbox/togeojson": "^0.16.0",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.2",
     "@mui/x-date-pickers": "^6.6.0",
